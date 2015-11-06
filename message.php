@@ -10,74 +10,39 @@
 
 	$rarr = array('status' => 0);
 
-	if ( $r['do'] == 'get' ){
-		$query = "select * from posts where postid={$r['postid']}";
-		$result = mysqli_query($con, $query);
-
-		if ($result){
-			$postarr = mysqli_fetch_assoc($result);
-			$rarr = array_merge($postarr, $rarr);
-			die( json_encode($rarr) );
-		} else {
-			$rarr['status'] = 11;
-			$rarr['error'] = 'Post doesn\'t exist.';
-			die( json_encode($rarr) );
-		}
-
-	} else if ( $r['do'] == 'set' ){
-		// send token, userid, content, [groupid, pollid]
+	if ( $r['action'] == 'send' ){
+		// send message
 		if ( tokenvalid($r['id'], $r['token']) ){
-			$username = getUsername($r['id']);
 			$sqlIns = makeSQLInsert($r);
-			$query = "insert into posts ( {$sqlIns['cols']} , username ) values ( {$sqlIns['vals']} , '$username' )";
-
+			$query = "insert into msgs ( {$sqlIns['cols']},"
+			. "username,"
+			. "username_rec,"
+			. "doc )"
+			. " values ( {$sqlIns['vals']},"
+			. "'" . getUsername($r['id']) . "',"
+			. "'" . getUsername($r['recid']) . "',"
+			. "'" . date('Y-m-d H:i:s') . "')";
 			$result = mysqli_query($con, $query);
-			if ( $result ){
-				$cdate = date('Y-m-d H:i:s');
-				$query = "update posts set weight=postid,doc='{$cdate}' where id={$r['id']} order by postid desc limit 1"; // add weight=posts to the last post
-				$result = mysqli_query($con, $query);
-				die( json_encode($rarr) );
-			} else
-				makeError(2);
-
+			if ($result){
+				die(json_encode($rarr));
+			} else {
+				makeError(5);
+			}
 		} else {
 			makeError(3);
 		}
-
-	} else if ( $r['do'] == 'feed' ){
+	} else if ( $r['action'] == 'feed' ){
 		// get feed
-		// userid, groupid
-		if ( array_key_exists("groupid", $r) ){
-			// get posts from group
-			$q = "select * from posts where groupid={$r['groupid']} order by weight desc limit 20";
-			$res = mysqli_query($con, $q);
-			$rarr['posts'] = array();
-			while ($row = mysqli_fetch_assoc($res)){
-				$rarr['posts'][] = $row;
+		if ( tokenvalid($r['id'], $r['token']) ){
+			$query = "select * from msgs where recid={$r['id']} or id={$r['id']} order by msgid desc limit 20";
+			$result = mysqli_query($con, $query);
+			$rarr['messages'] = array();
+			while ($row = mysqli_fetch_assoc($result)){
+				$rarr['messages'][] = $row;
 			}
-			die ( json_encode($rarr) );
+			die (json_encode($rarr));
 		} else {
-			// get posts for a user
-			if ( array_key_exists("id", $r) ){
-				$q = "select * from eyeds where id={$r['id']}";
-				$res = mysqli_query($con, $q);
-				$row = mysqli_fetch_assoc($res);
-				$groups = ArrToLike(StrToArr($row['groups']),0);
-				if ($groups != '')
-					$gq = "groupd in ({$groups}) or";
-				else
-					$gq = '';
-				$q = "select * from posts where {$gq} groupid is NULL order by weight desc limit 20";
-				$res = mysqli_query($con, $q);
-				$rarr['posts'] = array();
-				while ($row = mysqli_fetch_assoc($res)){
-					$rarr['posts'][] = $row;
-				}
-				die ( json_encode($rarr) );
-
-			} else {
-				makeError(1);
-			}
+			makeError(3);
 		}
 
 	} else {

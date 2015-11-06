@@ -39,6 +39,8 @@
 			$rarr['error'] = "Database connection error";
 		else if ($code == 4)
 			$rarr['error'] = "Wrong username or password";
+		else if ($code == 5)
+			$rarr['error'] = "Invalid parameters passed";
 		die( json_encode($rarr) );
 	}
 
@@ -51,7 +53,7 @@
 		$cols = ''; 
 		$vals = '';
 		foreach ($r as $k => $v) {
-			if ($k == 'token' || $k == 'do')
+			if ($k == 'token' || $k == 'do' || $k == 'action')
 				continue;
 			$cols .= $k . ',';
 			$vals .= "'" . $v . "'" . ",";
