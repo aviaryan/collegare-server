@@ -5,13 +5,13 @@ import json
 server = "http://collegare.eu5.org"
 server = "http://localhost/collegare-server"
 
-username="test2"
+username="test5"
 password="qwerty"
 
 phash = hashlib.sha256( str.encode(password) ).hexdigest()
 # print( phash )
 
-dopost = 0
+dopost = 1
 payload = { 'username': username , 'password': phash }
 r = requests.post(server + "/login.php", data = payload)
 
@@ -19,14 +19,14 @@ if r.ok and dopost:
 	json_res = json.loads( bytes.decode(r.content) )
 	token = json_res['token']
 
-	payload = { 'do': 'set', 'id': json_res['id'] , 'content': 'tupid not post', 'groupid': 2, 'token': json_res['token'] };
+	payload = { 'do': 'set', 'id': json_res['id'] , 'content': 'tupid not post', 'token': json_res['token'] };
 	r = requests.post(server + "/post.php", data=payload)
 	if r.ok:
 		print( r.content )
 
 # assuming that the post was created
 
-getpost = 1
+getpost = 0
 if getpost:
 	payload = { 'do': 'feed', 'id': 1 };
 	r = requests.post(server + "/post.php", data = payload)

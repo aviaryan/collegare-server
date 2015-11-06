@@ -30,12 +30,12 @@
 		if ( tokenvalid($r['id'], $r['token']) ){
 			$username = getUsername($r['id']);
 			$sqlIns = makeSQLInsert($r);
-			$query = "insert into posts ( {$sqlIns['cols']} , username ) values ( {$sqlIns['vals']} , '$username' )";
-
+			$cdate = date('Y-m-d H:i:s');
+			$query = "insert into posts ( {$sqlIns['cols']} , username, doc ) values ( {$sqlIns['vals']} , '$username', '$cdate' )";
 			$result = mysqli_query($con, $query);
 			if ( $result ){
-				$cdate = date('Y-m-d H:i:s');
-				$query = "update posts set weight=postid,doc='{$cdate}' where id={$r['id']} order by postid desc limit 1"; // add weight=posts to the last post
+				$query = "update posts set weight=postid where id={$r['id']} order by postid desc limit 1"; // add weight=posts to the last post
+				// id = r[id] is a safety belt in case of parallel requests
 				$result = mysqli_query($con, $query);
 				die( json_encode($rarr) );
 			} else
