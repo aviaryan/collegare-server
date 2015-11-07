@@ -14,7 +14,7 @@ payload = { 'username': username , 'password': phash }
 r = requests.post(server + "/login.php", data = payload)
 json_res = json.loads( bytes.decode(r.content) )
 
-dopost = 1
+dopost = 0
 if r.ok and dopost:
 	payload = { 'action': 'send', 'id': json_res['id'] , 'content': 'xoxo', 'recid': 1, 'token': json_res['token'] };
 	r = requests.post(server + "/message.php", data=payload)
@@ -23,9 +23,17 @@ if r.ok and dopost:
 
 # assuming that the post was created
 
-getpost = 1
+getpost = 0
 if getpost:
 	payload = { 'action': 'feed', 'id': 3, 'token': json_res['token'] };
+	r = requests.post(server + "/message.php", data = payload)
+	if r.ok:
+		print( json.dumps( json.loads(bytes.decode(r.content)) , indent=4 ) )
+
+
+getchat = 1
+if getchat:
+	payload = { 'action': 'feedbyuser', 'id': 3, 'recid': 2, 'token': json_res['token'] };
 	r = requests.post(server + "/message.php", data = payload)
 	if r.ok:
 		print( json.dumps( json.loads(bytes.decode(r.content)) , indent=4 ) )

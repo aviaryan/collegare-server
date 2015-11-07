@@ -31,10 +31,15 @@
 		} else {
 			makeError(3);
 		}
-	} else if ( $r['action'] == 'feed' ){
+	} else if ( $r['action'] == 'feed' || $r['action'] == 'feedbyuser' ){
 		// get feed
 		if ( tokenvalid($r['id'], $r['token']) ){
-			$query = "select * from msgs where recid={$r['id']} or id={$r['id']} order by msgid desc limit 20";
+			$query = "select * from msgs where ";
+			if ($r['action'] == 'feed')
+				$query .= "recid={$r['id']} or id={$r['id']}";
+			else
+				$query .= "(id={$r['id']} and recid={$r['recid']}) or (id={$r['recid']} and recid={$r['id']})";
+			$query .= " order by msgid desc limit 20";
 			$result = mysqli_query($con, $query);
 			$rarr['messages'] = array();
 			while ($row = mysqli_fetch_assoc($result)){
@@ -44,7 +49,6 @@
 		} else {
 			makeError(3);
 		}
-
 	} else {
 		makeError(1);
 	}
