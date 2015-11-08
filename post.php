@@ -12,6 +12,8 @@
 	$rarr = array('status' => 0);
 
 	if ( $r['action'] == 'get' ){
+		// get a single post
+		// with all the fucking comments
 		$query = "select * from posts where postid={$r['postid']}";
 		$result = mysqli_query($con, $query);
 
@@ -22,6 +24,7 @@
 			$result = mysqli_query($con, $query);
 			$postarr['comments'] = array();
 			while ($row = mysqli_fetch_assoc($result)){
+				unset($row['postid']);
 				$postarr['comments'][] = $row;
 			}
 			$rarr = array_merge($postarr, $rarr);
@@ -33,6 +36,7 @@
 		}
 
 	} else if ( $r['action'] == 'set' ){
+		// create a new post
 		// send token, userid, content, [groupid, pollid]
 		if ( tokenvalid($r['id'], $r['token']) ){
 			$username = getUsername($r['id']);
@@ -53,7 +57,7 @@
 		}
 
 	} else if ( $r['action'] == 'feed' ){
-		// get feed
+		// get feed for a user or a group
 		// userid, groupid
 		if ( array_key_exists("groupid", $r) ){
 			// get posts from group
@@ -88,6 +92,23 @@
 			}
 		}
 
+	} else if ( $r['action'] == 'comment' ){
+		// comment on a post
+		if (!tokenvalid($r['id'], $r['token']))
+			makeError(3);
+		$username = getUsername($r['id']);
+		$sqlIns = makeSQLInsert($r);
+		$query = "insert into cmnts ( {$sqlIns['cols']},"
+			. "doc,"
+			. "username)"
+			. " values ( {$sqlIns['vals']},"
+			. "'" . date('Y-m-d H:i:s') . "',"
+			. "'" . getUsername($r['id']) . "')";
+		$result = mysqli_query($con, $query);
+		if ($result)
+			die( json_encode($rarr) );
+		else
+			makeError(2);
 	} else {
 		makeError(1);
 	}
