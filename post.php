@@ -11,12 +11,19 @@
 
 	$rarr = array('status' => 0);
 
-	if ( $r['do'] == 'get' ){
+	if ( $r['action'] == 'get' ){
 		$query = "select * from posts where postid={$r['postid']}";
 		$result = mysqli_query($con, $query);
 
 		if ($result){
 			$postarr = mysqli_fetch_assoc($result);
+			// get comments
+			$query = "select * from cmnts where postid={$r['postid']} order by commentid desc";
+			$result = mysqli_query($con, $query);
+			$postarr['comments'] = array();
+			while ($row = mysqli_fetch_assoc($result)){
+				$postarr['comments'][] = $row;
+			}
 			$rarr = array_merge($postarr, $rarr);
 			die( json_encode($rarr) );
 		} else {
@@ -25,7 +32,7 @@
 			die( json_encode($rarr) );
 		}
 
-	} else if ( $r['do'] == 'set' ){
+	} else if ( $r['action'] == 'set' ){
 		// send token, userid, content, [groupid, pollid]
 		if ( tokenvalid($r['id'], $r['token']) ){
 			$username = getUsername($r['id']);
@@ -45,7 +52,7 @@
 			makeError(3);
 		}
 
-	} else if ( $r['do'] == 'feed' ){
+	} else if ( $r['action'] == 'feed' ){
 		// get feed
 		// userid, groupid
 		if ( array_key_exists("groupid", $r) ){
