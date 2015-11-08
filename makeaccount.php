@@ -1,6 +1,6 @@
 <?php
 	include("dbconnect.php");
-	include("login_functions.php");
+	include("functions/login_functions.php");
 ?>
 
 <?php

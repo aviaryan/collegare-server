@@ -19,6 +19,9 @@
 		. "groupid INT(5) ,"
 		. "weight INT(11) ,"
 		. "pollid INT(6) ,"
+		. "upvotecount INT(5) default 0,"
+		. "downvotecount INT(5) default 0,"
+		. "commentcount INT(5) default 0,"
 
 		. "index (id) ,"
 		. "index (groupid)"

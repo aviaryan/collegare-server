@@ -34,7 +34,7 @@ if getpost:
 
 getpost = 1
 if getpost:
-	payload = { 'action': 'get', 'postid': 1 };
+	payload = { 'action': 'get', 'postid': 4 };
 	r = requests.post(server + "/post.php", data = payload)
 	if r.ok:
 		print( json.dumps( json.loads(bytes.decode(r.content)) , indent=4 ) )
