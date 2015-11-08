@@ -8,3 +8,11 @@
 * groupid
 * weight (assign same as postid, the change)
 * poll id
+* commentcount
+* upvotecount
+* downvotecount
+
+
+### Notes
+
+* The counts (comment, upvote, downvote) will be served at feed so that they could be displayed with the posts.
