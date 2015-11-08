@@ -79,7 +79,7 @@
 					$gq = "groupd in ({$groups}) or";
 				else
 					$gq = '';
-				$q = "select * from posts where {$gq} groupid is NULL order by weight desc limit 20";
+				$q = "select * from posts where {$gq} groupid is NULL order by weight desc, postid desc limit 20";
 				$res = mysqli_query($con, $q);
 				$rarr['posts'] = array();
 				while ($row = mysqli_fetch_assoc($res)){
