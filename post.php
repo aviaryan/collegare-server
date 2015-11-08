@@ -105,9 +105,10 @@
 			. "'" . date('Y-m-d H:i:s') . "',"
 			. "'" . getUsername($r['id']) . "')";
 		$result = mysqli_query($con, $query);
-		if ($result)
+		if ($result){
+			execQuery("update posts set commentcount=commentcount+1 where postid={$r['postid']}");
 			die( json_encode($rarr) );
-		else
+		} else
 			makeError(2);
 	} else {
 		makeError(1);

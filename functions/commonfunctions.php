@@ -81,4 +81,12 @@
 		return $s;
 	}
 	
+	function execQuery($query, $error=1){
+		global $con;
+		$result = mysqli_query($con, $query);
+		if ($result)
+			return 1;
+		else
+			makeError($error);
+	}
 ?>
