@@ -1,7 +1,7 @@
+
 <?php
 
 	include("dbconnect.php");
-
 	include("functions/commonfunctions.php");
 
 	$r = array();
@@ -65,6 +65,7 @@
 			$res = mysqli_query($con, $q);
 			$rarr['posts'] = array();
 			while ($row = mysqli_fetch_assoc($res)){
+				$row['vote'] = getUserVote($r['id'], $row['postid']);
 				$rarr['posts'][] = $row;
 			}
 			die ( json_encode($rarr) );
@@ -83,6 +84,7 @@
 				$res = mysqli_query($con, $q);
 				$rarr['posts'] = array();
 				while ($row = mysqli_fetch_assoc($res)){
+					$row['vote'] = getUserVote($r['id'], $row['postid']);
 					$rarr['posts'][] = $row;
 				}
 				die ( json_encode($rarr) );
@@ -113,4 +115,14 @@
 	} else {
 		makeError(1);
 	}
+
+
+	function getUserVote($id, $postid){
+		$res = execQuery("select vote from vts where id={$id} and postid={$postid}");
+		if (mysqli_num_rows($res) > 0)
+			return mysqli_fetch_row($res)[0];
+		else
+			return 0;
+	}
+	
 ?>

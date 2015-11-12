@@ -85,7 +85,7 @@
 		global $con;
 		$result = mysqli_query($con, $query);
 		if ($result)
-			return 1;
+			return $result;
 		else
 			makeError($error);
 	}
