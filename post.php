@@ -19,6 +19,7 @@
 
 		if ($result){
 			$postarr = mysqli_fetch_assoc($result);
+			$postarr['vote'] = getUserVote($r['id'], $r['postid']);
 			// get comments
 			$query = "select * from cmnts where postid={$r['postid']} order by commentid desc";
 			$result = mysqli_query($con, $query);
