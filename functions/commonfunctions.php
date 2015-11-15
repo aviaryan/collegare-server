@@ -43,6 +43,8 @@
 			$rarr['error'] = "Invalid parameters passed";
 		else if ($code == 6)
 			$rarr['error'] = 'Non-existant user';
+		else if ($code == 7)
+			$rarr['error'] = 'Some problem occured';
 		die( json_encode($rarr) );
 	}
 

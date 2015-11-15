@@ -36,8 +36,16 @@ if r.ok:
 	print( json.dumps(json_res, indent=4, sort_keys=True) )
 
 # set user info
-payload = { 'action': 'set', 'id': uid, 'token': token, 'username': 'test3' }
+payload = { 'action': 'set', 'id': uid, 'token': token, 'username': username }
 r = requests.post(server + "/user.php", data = payload)
 if r.ok:
+	json_res = json.loads( bytes.decode(r.content) )
+	print( json.dumps(json_res, indent=4, sort_keys=True) )
+
+# set user image
+payload = { 'action': 'setpic', 'id': uid, 'token': token }
+r = requests.post(server + "/user.php", data = payload, files = {'file': open('profile.png', 'rb')} )
+if r.ok:
+	print(r.content)
 	json_res = json.loads( bytes.decode(r.content) )
 	print( json.dumps(json_res, indent=4, sort_keys=True) )

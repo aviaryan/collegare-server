@@ -36,7 +36,45 @@
 			}
 		$updtStmt = makeSQLUpdate($r);
 		if (strlen( trim($updtStmt) ) > 0)
-			execQuery("update eyeds set " . $updtStmt . " where id={$id}");
+			execQuery("update eyeds set " . $updtStmt . " where id={$id}", 5);
 		die( json_encode($rarr) );
+
+	} else if ($r['action'] == 'setpic'){
+		// SET USER PIC
+		// file name should be $ID
+		if (!tokenvalid($r['id'], $r['token']))
+			makeError(3);
+		foreach ($_FILES as $key => $value) {
+			$upfile = $key;
+			break;
+		}
+		$uploaddir = 'uploads/';
+
+		convertImage($_FILES[$upfile]['tmp_name'], $uploaddir . $r['id']);
+		die( json_encode($rarr) );
+	} else {
+		// invalid option
+		makeError(1);
 	}
+
+
+	function convertImage($img, $dst){
+		if (($img_info = getimagesize($img)) === FALSE)
+			die("Image not found or not an image");
+
+		$width = $img_info[0];
+		$height = $img_info[1];
+
+		switch ($img_info[2]) {
+			case IMAGETYPE_GIF  : $src = imagecreatefromgif($img);  break;
+			case IMAGETYPE_JPEG : $src = imagecreatefromjpeg($img); break;
+			case IMAGETYPE_PNG  : $src = imagecreatefrompng($img);  break;
+			default : die("Unknown filetype");
+		}
+
+		$tmp = imagecreatetruecolor($width, $height);
+		imagecopyresampled($tmp, $src, 0, 0, 0, 0, $width, $height, $width, $height);
+		imagejpeg($tmp, $dst.".jpg");
+	}
+
 ?>
