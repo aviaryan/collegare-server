@@ -41,6 +41,8 @@
 			$rarr['error'] = "Wrong username or password";
 		else if ($code == 5)
 			$rarr['error'] = "Invalid parameters passed";
+		else if ($code == 6)
+			$rarr['error'] = 'Non-existant user';
 		die( json_encode($rarr) );
 	}
 

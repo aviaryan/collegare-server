@@ -20,7 +20,9 @@
 		. "dob date ,"
 		. "adminof Varchar(200) ,"
 		. "id INT(5) auto_increment primary key,"
-		. "phash varchar(65)"
+		. "phash varchar(65),"
+		
+		. "index (username)"
 		. ")";
 	
 	$result = mysqli_query($con, $query);

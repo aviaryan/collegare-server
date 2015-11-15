@@ -20,6 +20,7 @@
 			if ($res){
 				$res = execQuery("select * from eyeds where id={$r['id']}");
 				$userarr = mysqli_fetch_assoc($res);
+				unset($userarr['phash']);
 				$rarr['token'] = $token;
 				die( json_encode(array_merge($rarr, $userarr)) );
 			} else
@@ -34,6 +35,7 @@
 		if ( mysqli_num_rows($resultuser) > 0 ){ // pass correct
 			// ALL USER DATA
 			$userarr = mysqli_fetch_assoc( $resultuser );
+			unset($userarr['phash']);
 			$randstr = generateToken();
 			$result = setToken($userarr['id'], $randstr);
 
@@ -42,15 +44,12 @@
 				$rarr = array_merge($rarr, $userarr);
 				die( json_encode($rarr) );
 			} else
-				// db error
-				makeError(2);
+				makeError(2); // db err
 		} else
-			// wrong credentials
-			makeError(4);
+			makeError(4); // wrong cred
 
 	} else {
-		// wrong option
-		makeError(1);
+		makeError(1); // wrong option
 	}
 
 

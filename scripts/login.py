@@ -5,7 +5,7 @@ import json
 server = "http://collegare.eu5.org"
 server = "http://localhost/collegare-server"
 
-username="test2"
+username="test3"
 password="qwerty"
 
 phash = hashlib.sha256( str.encode(password) ).hexdigest()
@@ -22,6 +22,13 @@ if r.ok:
 # log 2
 payload = { 'id': json_res['id'], 'token': json_res['token'] }
 r = requests.post(server + "/login.php", data = payload)
+if r.ok:
+	json_res = json.loads( bytes.decode(r.content) )
+	print( json.dumps(json_res, indent=4, sort_keys=True) )
+
+# get user info
+payload = { 'username': json_res['username'], 'action': 'get' }
+r = requests.post(server + "/user.php", data = payload)
 if r.ok:
 	json_res = json.loads( bytes.decode(r.content) )
 	print( json.dumps(json_res, indent=4, sort_keys=True) )
