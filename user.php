@@ -15,8 +15,10 @@
 		$res = execQuery("select * from eyeds where username='{$r['username']}'", 6);
 		$row = mysqli_fetch_assoc($res);
 		unset($row['phash']);
-		$res = execQuery("select (sum(upcount)*2)-(sum(downcount)*3) from posts where id={$row['id']}"); // 2/3 ratio
-		$row['holiness'] = mysqli_fetch_row($res)[0];
+		$res = execQuery("select (sum(upcount)*5)-(sum(downcount)*7),count(*) from posts where id={$row['id']}"); // 2/3 ratio
+		$postStats = mysqli_fetch_row($res);
+		$row['holiness'] = $postStats[0];
+		$row['postcount'] = $postStats[1];
 		die( json_encode( array_merge($rarr, $row)) );
 
 	} else if ($r['action'] == 'set'){
