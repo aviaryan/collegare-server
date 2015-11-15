@@ -90,12 +90,13 @@ if step<4:
 print('comments done')
 print('now voting')
 
+vs = ['upvote', 'downvote', 'none']
 if step<5:
 	for i in range(1,10):
 		tid = random.randrange(5)+1
 		token = getauth('test' + str(tid), passhash)
 		tpostid = random.randrange(5)+1
-		action = 'upvote' if ((tid+tpostid) % 2 == 0) else 'downvote'
+		action = vs[ (tid+tpostid)%3 ]
 		payload = { 'action': action, 'id': tid, 'token': token, 'postid': tpostid };
 		r = requests.post(server + "/vote.php", data=payload)
 		print( r.content )

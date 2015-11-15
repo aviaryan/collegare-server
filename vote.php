@@ -10,7 +10,7 @@
 
 	$rarr = array('status' => 0);
 
-	if ( $r['action'] == 'upvote' || $r['action'] == 'downvote' ){
+	if ( $r['action'] == 'upvote' || $r['action'] == 'downvote' || $r['action'] == 'none' ){
 		// upvote/downvote a post
 		// if already voted, it changes the vote to upvote/downvote
 		if (!tokenvalid($r['id'], $r['token']))
@@ -18,30 +18,49 @@
 
 		$query = "select vote from vts where postid={$r['postid']} and id={$r['id']}";
 		$result = mysqli_query($con, $query);
-		$vote = ($r['action'] == 'upvote') ? 1 : -1;
+		$vote = ($r['action'] == 'upvote') ? 1 : ( ($r['action'] == 'downvote') ? -1 : 0 );
 
 		if ( mysqli_num_rows($result) > 0 ){
+			// already voted
 			$curVote = mysqli_fetch_row($result)[0];
 			if ($curVote == $vote) // alerady voted same
 				die(json_encode($rarr));
-			// reverse vote
-			$weight_change = ($vote==1) ? 2 : -2;
-			execQuery("update vts set vote={$vote} where id={$r['id']} and postid={$r['postid']}", 5);
+			// change vote
+			if ($vote == 0)
+				removeVote($r['id'], $r['postid']);
+			else
+				execQuery("update vts set vote={$vote} where id={$r['id']} and postid={$r['postid']}", 5);
+			// update counts
 			if ($vote == 1)
 				$pQuery = "weight=weight+2,upcount=upcount+1,downcount=downcount-1";
-			else
+			else if ($vote == -1)
 				$pQuery = "weight=weight-2,upcount=upcount-1,downcount=downcount+1";
+			else {
+				if ($curVote == 1)
+					$pQuery = "weight=weight-1,upcount=upcount-1";
+				else
+					$pQuery = "weight=weight+1,downcount=downcount-1";
+			}
 			execQuery("update posts set {$pQuery} where postid={$r['postid']}", 2); // db con err
 			die(json_encode($rarr));
 		} else {
-			execQuery("insert into vts values ({$r['id']}, {$r['postid']}, {$vote})", 2);
-			if ($vote == 1)
-				execQuery("update posts set weight=weight+1,upcount=upcount+1 where postid={$r['postid']}");
-			else
-				execQuery("update posts set weight=weight-1,downcount=downcount+1 where postid={$r['postid']}");
+			// not voted yet
+			if ($vote != 0){
+				execQuery("insert into vts values ({$r['id']}, {$r['postid']}, {$vote})", 2);
+				if ($vote == 1)
+					execQuery("update posts set weight=weight+1,upcount=upcount+1 where postid={$r['postid']}");
+				else
+					execQuery("update posts set weight=weight-1,downcount=downcount+1 where postid={$r['postid']}");
+			}
 			die(json_encode($rarr));
 		}
 	} else {
+		// invalid option
 		makeError(1);
+	}
+
+
+	function removeVote($id, $postid){
+		$res = execQuery("delete from vts where id={$id} and postid={$postid}");
 	}
 ?>
