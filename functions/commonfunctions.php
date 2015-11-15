@@ -86,7 +86,16 @@
 		$result = mysqli_query($con, $query);
 		if ($result)
 			return $result;
-		else
+		else {
+			echo $query;
+			echo mysqli_error($con);
 			makeError($error);
+		}
+	}
+
+	function prefixSign($num){
+		if ($num > 0)
+			$num = '+' . $num;
+		return $num;
 	}
 ?>

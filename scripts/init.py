@@ -9,7 +9,7 @@ server = "http://collegare.eu5.org"
 server = "http://localhost/collegare-server"
 password = "qwerty"
 passhash = hashlib.sha256( str.encode( password ) ).hexdigest()
-step = 0
+step = 4
 
 # ---------------------------------------
 
@@ -95,7 +95,7 @@ if step<5:
 	for i in range(1,10):
 		tid = random.randrange(5)+1
 		token = getauth('test' + str(tid), passhash)
-		tpostid = random.randrange(5)+1
+		tpostid = random.randrange(8)+1
 		action = vs[ (tid+tpostid)%3 ]
 		payload = { 'action': action, 'id': tid, 'token': token, 'postid': tpostid };
 		r = requests.post(server + "/vote.php", data=payload)

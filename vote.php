@@ -32,14 +32,14 @@
 				execQuery("update vts set vote={$vote} where id={$r['id']} and postid={$r['postid']}", 5);
 			// update counts
 			if ($vote == 1)
-				$pQuery = "weight=weight+2,upcount=upcount+1,downcount=downcount-1";
+				$pQuery = genCountQuery(2,1,-1);
 			else if ($vote == -1)
-				$pQuery = "weight=weight-2,upcount=upcount-1,downcount=downcount+1";
+				$pQuery = genCountQuery(-2,-1,1);
 			else {
 				if ($curVote == 1)
-					$pQuery = "weight=weight-1,upcount=upcount-1";
+					$pQuery = genCountQuery(-1,-1,0); 
 				else
-					$pQuery = "weight=weight+1,downcount=downcount-1";
+					$pQuery = genCountQuery(1,0,-1);
 			}
 			execQuery("update posts set {$pQuery} where postid={$r['postid']}", 2); // db con err
 			die(json_encode($rarr));
@@ -62,5 +62,16 @@
 
 	function removeVote($id, $postid){
 		$res = execQuery("delete from vts where id={$id} and postid={$postid}");
+	}
+
+	function genCountQuery($wt, $up, $dn){
+		$str = '';
+		if ($wt != 0)
+			$str .= "weight=weight" . prefixSign($wt) . ',';
+		if ($up != 0)
+			$str .= "upcount=upcount" . prefixSign($up) . ',';
+		if ($dn != 0)
+			$str .= "downcount=downcount" . prefixSign($dn) . ',';
+		return substr($str, 0, -1);
 	}
 ?>
