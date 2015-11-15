@@ -23,6 +23,9 @@
 		. "downcount INT(5) default 0,"
 		. "commentcount INT(5) default 0,"
 
+		. "foreign key (username) references eyeds (username) on delete cascade on update cascade,"
+		. "foreign key (id) references eyeds (id) on delete cascade,"
+		
 		. "index (id) ,"
 		. "index (groupid)"
 		. ")";

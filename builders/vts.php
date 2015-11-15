@@ -15,9 +15,10 @@
 		. "postid int(6) not null,"
 		. "vote tinyint(2) not null,"
 		. "primary key (id, postid),"
+		
 		. "foreign key (id) references eyeds (id) on delete cascade,"
 		. "foreign key (postid) references posts (postid) on delete cascade,"
-		
+
 		. "index(id)"
 		. ")";
 	

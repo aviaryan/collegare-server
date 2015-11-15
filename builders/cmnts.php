@@ -18,6 +18,10 @@
 		. "doc timestamp,"
 		. "username varchar(30),"
 
+		. "foreign key (username) references eyeds (username) on delete cascade on update cascade,"
+		. "foreign key (id) references eyeds (id) on delete cascade,"
+		. "foreign key (postid) references posts (postid) on delete cascade,"
+
 		. "index (postid)"
 		// no need for id for now
 		. ")";
