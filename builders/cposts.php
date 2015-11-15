@@ -17,7 +17,7 @@
 		. "id INT(5) ,"
 		. "username varchar(30) ,"
 		. "groupid INT(5) ,"
-		. "weight INT(11) ,"
+		. "weight INT(9) ,"
 		. "pollid INT(6) ,"
 		. "upcount INT(5) default 0,"
 		. "downcount INT(5) default 0,"

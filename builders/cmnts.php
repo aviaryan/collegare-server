@@ -18,7 +18,6 @@
 		. "doc timestamp,"
 		. "username varchar(30),"
 
-		. "index (commentid),"
 		. "index (postid)"
 		// no need for id for now
 		. ")";
