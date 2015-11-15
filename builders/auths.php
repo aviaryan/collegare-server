@@ -11,8 +11,11 @@
 	}
 
 	$query = "create table auths ("
-		. "id int(5) PRIMARY KEY,"
-		. "token char(100) unique "
+		. "id int(5) unique,"
+		. "token char(100) unique,"
+
+		. "foreign key (id) references eyeds (id) on delete cascade,"
+		. "index (id)"
 		. ")";
 	
 	echo $query;
