@@ -64,6 +64,13 @@
 		return $ret;
 	}
 
+	function makeSQLUpdate($r){
+		$str = '';
+		foreach ($r as $k => $v)
+			$str .= "{$k}='{$v}',";
+		return substr($str, 0, -1);
+	}
+
 	function StrToArr($str){
 		$str = trim($str);
 		$tok = strtok($str, ' ');

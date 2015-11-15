@@ -12,12 +12,12 @@ phash = hashlib.sha256( str.encode(password) ).hexdigest()
 # print( phash )
 
 payload = { 'username': username , 'password': phash }
-
 r = requests.post(server + "/login.php", data = payload)
-
 if r.ok:
 	json_res = json.loads( bytes.decode(r.content) )
 	print( json.dumps(json_res, indent=4, sort_keys=True) )
+uid = json_res['id']
+
 
 # log 2
 payload = { 'id': json_res['id'], 'token': json_res['token'] }
@@ -26,8 +26,17 @@ if r.ok:
 	json_res = json.loads( bytes.decode(r.content) )
 	print( json.dumps(json_res, indent=4, sort_keys=True) )
 
+token = json_res['token']
+
 # get user info
 payload = { 'username': json_res['username'], 'action': 'get' }
+r = requests.post(server + "/user.php", data = payload)
+if r.ok:
+	json_res = json.loads( bytes.decode(r.content) )
+	print( json.dumps(json_res, indent=4, sort_keys=True) )
+
+# set user info
+payload = { 'action': 'set', 'id': uid, 'token': token, 'username': 'test3' }
 r = requests.post(server + "/user.php", data = payload)
 if r.ok:
 	json_res = json.loads( bytes.decode(r.content) )
