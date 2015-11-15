@@ -11,9 +11,9 @@
 	}
 
 	$query = "create table eyeds ("
-		. "firstname Varchar(30) ,"
+		. "firstname Varchar(30) not null ,"
 		. "lastname Varchar(30) ,"
-		. "username Varchar(30) Unique ,"
+		. "username Varchar(30) Unique not null ,"
 		. "email Varchar(50) NOT NULL ,"
 		. "sex Varchar(1) ,"
 		. "groups Varchar(200) ,"
@@ -23,12 +23,12 @@
 		. "phash varchar(65)"
 		. ")";
 	
-	echo $query;
 	$result = mysqli_query($con, $query);
 	if ($result){
 		echo "Success";
 	} else {
 		echo "Fail";
+		echo $query;
 		echo mysqli_error($con);
 	}
 ?>

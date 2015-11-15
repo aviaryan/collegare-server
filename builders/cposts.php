@@ -12,7 +12,7 @@
 
 	$query = "create table posts ("
 		. "postid INT(9) auto_increment primary key,"
-		. "content varchar(1000) ,"
+		. "content varchar(1000) not null,"
 		. "doc timestamp ,"
 		. "id INT(5) ,"
 		. "username varchar(30) ,"
@@ -25,7 +25,7 @@
 
 		. "foreign key (username) references eyeds (username) on delete cascade on update cascade,"
 		. "foreign key (id) references eyeds (id) on delete cascade,"
-		
+
 		. "index (id) ,"
 		. "index (groupid)"
 		. ")";

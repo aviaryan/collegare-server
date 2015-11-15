@@ -13,7 +13,7 @@
 	$query = "create table cmnts ("
 		. "commentid INT(9) auto_increment primary key,"
 		. "postid INT(6),"
-		. "content varchar(1000),"
+		. "content varchar(1000) not null,"
 		. "id INT(5),"
 		. "doc timestamp,"
 		. "username varchar(30),"

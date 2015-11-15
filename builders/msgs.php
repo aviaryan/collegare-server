@@ -12,7 +12,7 @@
 
 	$query = "create table msgs ("
 		. "msgid INT(6) auto_increment primary key,"
-		. "content varchar(1000),"
+		. "content varchar(1000) not null,"
 		. "doc timestamp,"
 		. "id INT(5),"
 		. "recid INT(5),"

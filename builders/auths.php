@@ -12,7 +12,7 @@
 
 	$query = "create table auths ("
 		. "id int(5) unique,"
-		. "token char(100) unique,"
+		. "token char(100),"
 
 		. "foreign key (id) references eyeds (id) on delete cascade,"
 		. "index (id)"
