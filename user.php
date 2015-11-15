@@ -50,15 +50,27 @@
 		}
 		$uploaddir = 'uploads/';
 
-		convertImage($_FILES[$upfile]['tmp_name'], $uploaddir . $r['id']);
+		savePic($_FILES[$upfile]['tmp_name'], $uploaddir . $r['id']);
 		die( json_encode($rarr) );
+
+	} else if ($r['action'] == 'getpic' || $r['action'] == 'getfullpic'){
+		// GET USER PIC
+		// BOTH TYPES
+		$id = getId($r['username']);
+		$url = 'uploads/' . $id . ($r['action'] == 'getpic' ? '_thumb' : '') . '.jpg';
+		if (file_exists($url))
+			$rarr['url'] = $url;
+		else
+			$rarr['url'] = '';
+		die( json_encode($rarr) );
+
 	} else {
 		// invalid option
 		makeError(1);
 	}
 
 
-	function convertImage($img, $dst){
+	function savePic($img, $dst){
 		if (($img_info = getimagesize($img)) === FALSE)
 			die("Image not found or not an image");
 
@@ -72,9 +84,13 @@
 			default : die("Unknown filetype");
 		}
 
-		$tmp = imagecreatetruecolor($width, $height);
-		imagecopyresampled($tmp, $src, 0, 0, 0, 0, $width, $height, $width, $height);
-		imagejpeg($tmp, $dst.".jpg");
+		$tmp = imagecreatetruecolor(256, 256);
+		imagecopyresampled($tmp, $src, 0, 0, 0, 0, 256, 256, $width, $height);
+		imagejpeg($tmp, $dst.".jpg", 75);
+
+		$tmp = imagecreatetruecolor(64, 64);
+		imagecopyresampled($tmp, $src, 0, 0, 0, 0, 64, 64, $width, $height);
+		imagejpeg($tmp, $dst."_thumb.jpg", 50);
 	}
 
 ?>

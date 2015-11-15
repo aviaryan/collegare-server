@@ -27,6 +27,12 @@
 		}
 	}
 
+	function getId($username){
+		global $con;
+		$res = execQuery("select id from eyeds where username='{$username}'");
+		return mysqli_fetch_row($res)[0];
+	}
+
 
 	function makeError($code){
 		global $rarr;
