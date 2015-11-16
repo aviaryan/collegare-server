@@ -4,9 +4,7 @@
 	
 	$query = "drop table if exists eyeds";
 	$result = mysqli_query($con, $query);
-	if ($result){
-		echo "drop table successful";
-	} else {
+	if (!$result){
 		echo "drop table fail";
 	}
 

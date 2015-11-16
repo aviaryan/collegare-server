@@ -2,29 +2,31 @@
 
 	include("../dbconnect.php");
 	
-	$query = "drop table if exists vts";
+	$query = "drop table if exists gnetwork";
 	$result = mysqli_query($con, $query);
 	if (!$result){
 		echo "drop table fail";
 	}
-	$query = "create table vts ("
+
+	$query = "create table gnetwork ("
 		. "id int(5) not null,"
-		. "postid int(6) not null,"
-		. "vote tinyint(2) not null,"
-		. "primary key (id, postid),"
+		. "gid int(4) not null,"
+		. "role bit not null,"
+		. "primary key (id, gid),"
 		
 		. "foreign key (id) references eyeds (id) on delete cascade,"
-		. "foreign key (postid) references posts (postid) on delete cascade,"
+		. "foreign key (gid) references groups (gid) on delete cascade,"
 
-		. "index(id)"
+		. "index(id),"
+		. "index(gid)"
 		. ")";
 	
 	$result = mysqli_query($con, $query);
 	if ($result){
 		echo "Success";
 	} else {
-		echo $query;
 		echo "Fail";
+		echo $query;
 		echo mysqli_error($con);
 	}
 ?>

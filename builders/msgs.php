@@ -4,9 +4,7 @@
 	
 	$query = "drop table if exists msgs";
 	$result = mysqli_query($con, $query);
-	if ($result){
-		echo "drop table successful";
-	} else {
+	if (!$result){
 		echo "drop table fail";
 	}
 
@@ -28,11 +26,11 @@
 		. "index (recid)"
 		. ")";
 	
-	echo $query;
 	$result = mysqli_query($con, $query);
 	if ($result){
 		echo "Success";
 	} else {
+		echo $query;
 		echo "Fail";
 		echo mysqli_error($con);
 	}

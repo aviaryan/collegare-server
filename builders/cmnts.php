@@ -4,9 +4,7 @@
 	
 	$query = "drop table if exists cmnts";
 	$result = mysqli_query($con, $query);
-	if ($result){
-		echo "drop table successful";
-	} else {
+	if (!$result){
 		echo "drop table fail";
 	}
 
@@ -26,11 +24,11 @@
 		// no need for id for now
 		. ")";
 	
-	echo $query;
 	$result = mysqli_query($con, $query);
 	if ($result){
 		echo "Success";
 	} else {
+		echo $query;
 		echo "Fail";
 		echo mysqli_error($con);
 	}

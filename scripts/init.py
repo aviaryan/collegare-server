@@ -38,13 +38,10 @@ def getauth(username, passhash):
 print('creating tables....')
 
 if step<1:
-	r = requests.get(server + '/builders/' + 'dropall.php')
-	r = requests.get(server + '/builders/' + 'eyeds.php')
-	r = requests.get(server + '/builders/' + 'cposts.php')
-	r = requests.get(server + '/builders/' + 'cmnts.php')
-	r = requests.get(server + '/builders/' + 'vts.php')
-	r = requests.get(server + '/builders/' + 'msgs.php')
-	r = requests.get(server + '/builders/' + 'auths.php')
+	arr = ['dropall', 'eyeds', 'tgroups', 'tgnetwork', 'cposts', 'cmnts', 'vts', 'msgs', 'auths']
+	for i in arr:
+		r = requests.get(server + '/builders/' + i + '.php')
+		print(r.content)
 
 print('creating tables done')
 print('creating users')
@@ -78,7 +75,7 @@ print('posts done')
 print('creating comments')
 
 if step<4:
-	for i in range(1,20):
+	for i in range(1,15):
 		tid = random.randrange(5)+1
 		token = getauth('test' + str(tid), passhash)
 		tpostid = random.randrange(8)+1
@@ -92,7 +89,7 @@ print('now voting')
 
 vs = ['upvote', 'downvote', 'none']
 if step<5:
-	for i in range(1,20):
+	for i in range(1,15):
 		tid = random.randrange(5)+1
 		token = getauth('test' + str(tid), passhash)
 		tpostid = random.randrange(8)+1
