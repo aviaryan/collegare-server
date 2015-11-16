@@ -17,8 +17,12 @@
 		. ")";
 	
 	$result = mysqli_query($con, $query);
+
 	if ($result){
 		echo "Success";
+		$result = mysqli_query($con, "insert into groups (name, gusername) values ('default', 'default')");
+		if (!$result)
+			echo "default group (1) creation failed";
 	} else {
 		echo "Fail";
 		echo $query;

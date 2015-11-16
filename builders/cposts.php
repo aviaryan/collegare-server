@@ -14,7 +14,7 @@
 		. "doc timestamp ,"
 		. "id INT(5) ,"
 		. "username varchar(30) ,"
-		. "gid INT(5) default 0 ,"
+		. "gid INT(5) default 1 ,"
 		. "weight INT(9) ,"
 		. "pollid INT(6) ,"
 		. "upcount INT(5) default 0,"
@@ -23,6 +23,7 @@
 
 		. "foreign key (username) references eyeds (username) on delete cascade on update cascade,"
 		. "foreign key (id) references eyeds (id) on delete cascade,"
+		. "foreign key (gid) references groups (gid) on delete cascade,"
 
 		. "index (id) ,"
 		. "index (gid)"
