@@ -44,7 +44,7 @@ if r.ok:
 
 # set user image
 payload = { 'action': 'setpic', 'id': uid, 'token': token }
-r = requests.post(server + "/user.php", data = payload, files = {'file': open('profile.png', 'rb')} )
+r = requests.post(server + "/user.php", data = payload, files = {'file': open('avi.jpg', 'rb')} )
 if r.ok:
 	json_res = json.loads( bytes.decode(r.content) )
 	print( json.dumps(json_res, indent=4, sort_keys=True) )
