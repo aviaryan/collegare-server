@@ -1,4 +1,3 @@
-
 <?php
 
 	include("dbconnect.php");
@@ -60,9 +59,9 @@
 	} else if ( $r['action'] == 'feed' ){
 		// get feed for a user or a group
 		// userid, groupid
-		if ( array_key_exists("groupid", $r) ){
+		if ( array_key_exists("gid", $r) ){
 			// get posts from group
-			$q = "select * from posts where groupid={$r['groupid']} order by weight desc limit 20";
+			$q = "select * from posts where gid={$r['gid']} order by weight desc limit 20";
 			$res = mysqli_query($con, $q);
 			$rarr['posts'] = array();
 			while ($row = mysqli_fetch_assoc($res)){
@@ -78,10 +77,10 @@
 				$row = mysqli_fetch_assoc($res);
 				$groups = ArrToLike(StrToArr($row['groups']),0);
 				if ($groups != '')
-					$gq = "groupd in ({$groups}) or";
+					$gq = "gid in ({$groups}) or";
 				else
 					$gq = '';
-				$q = "select * from posts where {$gq} groupid is NULL order by weight desc, postid desc limit 20";
+				$q = "select * from posts where {$gq} gid=1 order by weight desc, postid desc limit 20";
 				$res = mysqli_query($con, $q);
 				$rarr['posts'] = array();
 				while ($row = mysqli_fetch_assoc($res)){

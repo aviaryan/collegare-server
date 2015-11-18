@@ -11,7 +11,7 @@
 	$query = "create table gnetwork ("
 		. "id int(5) not null,"
 		. "gid int(4) not null,"
-		. "role bit not null,"
+		. "role bit not null default FALSE,"
 		. "primary key (id, gid),"
 		
 		. "foreign key (id) references eyeds (id) on delete cascade,"
