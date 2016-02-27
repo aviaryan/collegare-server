@@ -58,6 +58,15 @@
 
 <?php
 	// Language based functions. Independent of the application
+	
+	function hasKey($r, $key){
+		if (array_key_exists($r, $key)){
+			$v = $r[$key];
+			if ($v != '')
+				return true;
+		}
+		return false;
+	}
 
 	function makeSQLInsert($r){
 		$cols = ''; 
