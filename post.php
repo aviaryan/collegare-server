@@ -60,12 +60,15 @@
 		// get feed for a user or a group
 		// userid, groupid
 		if ( array_key_exists("gid", $r) ){
+			// limit by postid
+			if (array_key_exists("after", $r))
+				$postLimit = "and postid > {$r['after']}";
+			else if (array_key_exists("before", $r))
+				$postLimit = "and postid < {$r['before']}";
+			else
+				$postLimit = '';
 			// get posts from group
-			if (array_key_exists("after", $r)){
-				$q = "select * from (select * from posts where gid={$r['gid']} and postid > {$r['after']} order by postid desc limit 20) as recent order by weight desc";
-			} else {
-				$q = "select * from (select * from posts where gid={$r['gid']} order by postid desc limit 20) as recent order by weight desc";
-			}
+			$q = "select * from (select * from posts where gid={$r['gid']} {$postLimit} order by postid desc limit 20) as recent order by weight desc";
 			$res = mysqli_query($con, $q);
 			$rarr['posts'] = array();
 			while ($row = mysqli_fetch_assoc($res)){
@@ -76,6 +79,7 @@
 		} else {
 			// get posts for a user
 			if ( array_key_exists("id", $r) ){
+				// get user groups
 				$q = "select * from eyeds where id={$r['id']}";
 				$res = mysqli_query($con, $q);
 				$row = mysqli_fetch_assoc($res);
@@ -84,10 +88,14 @@
 					$gq = "gid in ({$groups}) or";
 				else
 					$gq = '';
+				// limit by post id
 				if (array_key_exists("after", $r))
 					$postLimit = "and postid > {$r['after']}";
+				else if (array_key_exists("before", $r))
+					$postLimit = "and postid < {$r['before']}";
 				else
 					$postLimit = '';
+				// get posts for user
 				$q = "select * from (select * from posts where ({$gq} gid=1) {$postLimit} order by postid desc limit 20) as recent order by weight desc";
 				$res = mysqli_query($con, $q);
 				$rarr['posts'] = array();
