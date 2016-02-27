@@ -2,6 +2,33 @@
 
 	include("dbconnect.php");
 	include("functions/commonfunctions.php");
+	include("DataModel.php");
+
+	/**
+	 * Posts Class
+	 * responsible for querying the posts database
+	 */
+	class Posts extends DataModel {
+		var $limit;
+
+		function __construct(){
+			parent::__construct();
+			$this->tablename = 'posts';
+			$this->addProjection('*');
+			$this->limit = 20;
+			$this->more = 'order by postid desc limit 20';
+		}
+
+		function getPostFeed($id){
+			return $this->doQuery( "select p.*, IfNull(vote,0) as vote from ("
+					. "(" . $this->getQueryStr() . ") as p "
+					. "left join "
+					. "(select * from vts) as v "
+					. "on v.postid = p.postid and v.id = $id"
+				. ") order by weight desc" );
+		}
+	}
+
 
 	$r = array();
 	foreach ($_POST as $key => $value) {
@@ -59,55 +86,50 @@
 	} else if ( $r['action'] == 'feed' ){
 		// get feed for a user or a group
 		// userid, groupid
+		$postObj = new Posts();
+
 		if ( array_key_exists("gid", $r) ){
-			// limit by postid
+			// limit by post id
 			if (array_key_exists("after", $r))
-				$postLimit = "and postid > {$r['after']}";
+				$postObj->addSelection("postid > {$r['after']}");
 			else if (array_key_exists("before", $r))
-				$postLimit = "and postid < {$r['before']}";
-			else
-				$postLimit = '';
+				$postObj->addSelection("postid < {$r['before']}");
 			// get posts from group
-			$q = "select * from (select * from posts where gid={$r['gid']} {$postLimit} order by postid desc limit 20) as recent order by weight desc";
-			$res = mysqli_query($con, $q);
+			$postObj->addSelection("gid={$r['gid']}");
+			$res = $postObj->getPostFeed($r['id']);
 			$rarr['posts'] = array();
 			while ($row = mysqli_fetch_assoc($res)){
-				$row['vote'] = getUserVote($r['id'], $row['postid']);
 				$rarr['posts'][] = $row;
 			}
 			die ( json_encode($rarr) );
 		} else {
 			// get posts for a user
-			if ( array_key_exists("id", $r) ){
-				// get user groups
-				$q = "select * from eyeds where id={$r['id']}";
-				$res = mysqli_query($con, $q);
-				$row = mysqli_fetch_assoc($res);
-				$groups = ArrToLike(StrToArr($row['groups']),0);
-				if ($groups != '')
-					$gq = "gid in ({$groups}) or";
-				else
-					$gq = '';
-				// limit by post id
-				if (array_key_exists("after", $r))
-					$postLimit = "and postid > {$r['after']}";
-				else if (array_key_exists("before", $r))
-					$postLimit = "and postid < {$r['before']}";
-				else
-					$postLimit = '';
-				// get posts for user
-				$q = "select * from (select * from posts where ({$gq} gid=1) {$postLimit} order by postid desc limit 20) as recent order by weight desc";
-				$res = mysqli_query($con, $q);
-				$rarr['posts'] = array();
-				while ($row = mysqli_fetch_assoc($res)){
-					$row['vote'] = getUserVote($r['id'], $row['postid']);
-					$rarr['posts'][] = $row;
-				}
-				die ( json_encode($rarr) );
-
-			} else {
+			// check for missing id
+			if ( !array_key_exists("id", $r) ){
 				makeError(1);
 			}
+			// get user groups
+			$q = "select * from eyeds where id={$r['id']}";
+			$res = mysqli_query($con, $q);
+			$row = mysqli_fetch_assoc($res);
+			$groups = ArrToLike(StrToArr($row['groups']),0);
+			if ($groups != '')
+				$gq = "gid in ({$groups}) or";
+			else
+				$gq = '';
+			// limit by post id
+			if (array_key_exists("after", $r))
+				$postObj->addSelection("postid > {$r['after']}");
+			else if (array_key_exists("before", $r))
+				$postObj->addSelection("postid < {$r['before']}");
+			// get posts for user
+			$postObj->addSelection("{$gq} gid=1");
+			$res = $postObj->getPostFeed($r['id']);
+			$rarr['posts'] = array();
+			while ($row = mysqli_fetch_assoc($res)){
+				$rarr['posts'][] = $row;
+			}
+			die ( json_encode($rarr) );
 		}
 
 	} else if ( $r['action'] == 'comment' ){
@@ -140,5 +162,4 @@
 		else
 			return 0;
 	}
-	
 ?>
