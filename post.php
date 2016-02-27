@@ -23,8 +23,8 @@
 			return $this->doQuery( "select p.*, IfNull(vote,0) as vote from ("
 					. "(" . $this->getQueryStr() . ") as p "
 					. "left join "
-					. "(select * from vts) as v "
-					. "on v.postid = p.postid and v.id = $id"
+					. "(select * from vts where id = $id) as v "
+					. "on v.postid = p.postid"
 				. ") order by weight desc" );
 		}
 	}
