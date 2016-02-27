@@ -37,12 +37,12 @@
 	function makeError($code){
 		global $rarr;
 		$rarr['status'] = $code;
-		if ($code == 3)
-			$rarr['error'] = "Problem while authenticating the user";
-		else if ($code == 1)
+		if ($code == 1)
 			$rarr['error'] = "Invalid Option";
 		else if ($code == 2)
 			$rarr['error'] = "Database connection error";
+		else if ($code == 3)
+			$rarr['error'] = "Problem while authenticating the user";
 		else if ($code == 4)
 			$rarr['error'] = "Wrong username or password";
 		else if ($code == 5)
@@ -51,6 +51,8 @@
 			$rarr['error'] = 'Non-existant user';
 		else if ($code == 7)
 			$rarr['error'] = 'Some problem occured';
+		else if ($code == 11)
+			$rarr['error'] = 'Post doesn\'t exist.';
 		die( json_encode($rarr) );
 	}
 
@@ -113,8 +115,8 @@
 		if ($result)
 			return $result;
 		else {
-			echo $query;
-			echo mysqli_error($con);
+			// echo $query;
+			// echo mysqli_error($con);
 			makeError($error);
 		}
 	}

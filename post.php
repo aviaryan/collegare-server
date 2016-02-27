@@ -16,7 +16,7 @@
 			$this->tablename = 'posts';
 			$this->addProjection('*');
 			$this->limit = 20;
-			$this->more = 'order by postid desc limit 20';
+			$this->more = "order by postid desc limit $this->limit";
 		}
 
 		function getPostFeed($id){
@@ -41,7 +41,7 @@
 		// get a single post
 		// with all the fucking comments
 		$query = "select * from posts where postid={$r['postid']}";
-		$result = mysqli_query($con, $query);
+		$result = execQuery($query, 11);
 
 		if ($result){
 			$postarr = mysqli_fetch_assoc($result);
@@ -56,12 +56,7 @@
 			}
 			$rarr = array_merge($postarr, $rarr);
 			die( json_encode($rarr) );
-		} else {
-			$rarr['status'] = 11;
-			$rarr['error'] = 'Post doesn\'t exist.';
-			die( json_encode($rarr) );
 		}
-
 	} else if ( $r['action'] == 'set' ){
 		// create a new post
 		// send token, userid, content, [groupid, pollid]
@@ -70,15 +65,13 @@
 			$sqlIns = makeSQLInsert($r);
 			$cdate = date('Y-m-d H:i:s');
 			$query = "insert into posts ( {$sqlIns['cols']} , username, doc ) values ( {$sqlIns['vals']} , '$username', '$cdate' )";
-			$result = mysqli_query($con, $query);
-			if ( $result ){
+			$result = execQuery($query, 2);
+			if ($result){
 				$query = "update posts set weight=postid where id={$r['id']} order by postid desc limit 1"; // add weight=posts to the last post
 				// id = r[id] is a safety belt in case of parallel requests
 				$result = mysqli_query($con, $query);
 				die( json_encode($rarr) );
-			} else
-				makeError(2);
-
+			}
 		} else {
 			makeError(3);
 		}
@@ -133,7 +126,8 @@
 		}
 
 	} else if ( $r['action'] == 'comment' ){
-		// comment on a post
+		// make a comment on a post
+		// yay
 		if (!tokenvalid($r['id'], $r['token']))
 			makeError(3);
 		$username = getUsername($r['id']);
