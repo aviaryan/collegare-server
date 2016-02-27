@@ -61,7 +61,11 @@
 		// userid, groupid
 		if ( array_key_exists("gid", $r) ){
 			// get posts from group
-			$q = "select * from posts where gid={$r['gid']} order by weight desc limit 20";
+			if (array_key_exists("after", $r)){
+				$q = "select * from (select * from posts where gid={$r['gid']} and postid > {$r['after']} order by postid desc limit 20) as recent order by weight desc";
+			} else {
+				$q = "select * from (select * from posts where gid={$r['gid']} order by postid desc limit 20) as recent order by weight desc";
+			}
 			$res = mysqli_query($con, $q);
 			$rarr['posts'] = array();
 			while ($row = mysqli_fetch_assoc($res)){
@@ -80,7 +84,11 @@
 					$gq = "gid in ({$groups}) or";
 				else
 					$gq = '';
-				$q = "select * from posts where {$gq} gid=1 order by weight desc, postid desc limit 20";
+				if (array_key_exists("after", $r))
+					$postLimit = "and postid > {$r['after']}";
+				else
+					$postLimit = '';
+				$q = "select * from (select * from posts where ({$gq} gid=1) {$postLimit} order by postid desc limit 20) as recent order by weight desc";
 				$res = mysqli_query($con, $q);
 				$rarr['posts'] = array();
 				while ($row = mysqli_fetch_assoc($res)){
