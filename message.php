@@ -2,6 +2,7 @@
 
 	include("dbconnect.php");
 	include("functions/commonfunctions.php");
+	include("DataModel.php");
 
 	$r = array();
 	foreach ($_POST as $key => $value) {
@@ -10,23 +11,32 @@
 
 	$rarr = array('status' => 0);
 
+
+	/**
+	 * Messages Class
+	 * interacts with Messages table
+	 */
+	class Messages extends DataModel {
+		function __construct(){
+			parent::__construct();
+			$this->tablename = 'msgs';
+			$this->addProjection('*');
+			$this->more = "order by msgid desc limit 20";
+		}
+	}
+
+	$msgObj = new Messages();
+
 	if ( $r['action'] == 'send' ){
 		// send message
 		if ( tokenvalid($r['id'], $r['token']) ){
-			$sqlIns = makeSQLInsert($r);
-			$query = "insert into msgs ( {$sqlIns['cols']},"
-			. "username,"
-			. "username_rec,"
-			. "doc )"
-			. " values ( {$sqlIns['vals']},"
-			. "'" . getUsername($r['id']) . "',"
-			. "'" . getUsername($r['recid']) . "',"
-			. "'" . date('Y-m-d H:i:s') . "')";
-			$result = mysqli_query($con, $query);
+			$msgObj->addInsertsFromArray($r, ['content', 'id', 'recid']);
+			$msgObj->addInsert('username', getUsername($r['id']));
+			$msgObj->addInsert('username_rec', getUsername($r['recid']));
+			$msgObj->addInsert('doc', date('Y-m-d H:i:s'));
+			$result = $msgObj->insert(5);
 			if ($result){
 				die(json_encode($rarr));
-			} else {
-				makeError(5);
 			}
 		} else {
 			makeError(3);
@@ -34,18 +44,16 @@
 	} else if ( $r['action'] == 'feed' || $r['action'] == 'feedbyuser' ){
 		// get feed
 		if ( tokenvalid($r['id'], $r['token']) ){
-			$query = "select * from msgs where ";
 			if ($r['action'] == 'feed')
-				$query .= "recid={$r['id']} or id={$r['id']}";
+				$msgObj->addSelection("recid={$r['id']} or id={$r['id']}");
 			else
-				$query .= "(id={$r['id']} and recid={$r['recid']}) or (id={$r['recid']} and recid={$r['id']})";
-			$query .= " order by msgid desc limit 20";
-			$result = mysqli_query($con, $query);
+				$msgObj->addSelection("(id={$r['id']} and recid={$r['recid']}) or (id={$r['recid']} and recid={$r['id']})");
+			$result = $msgObj->query();
 			$rarr['messages'] = array();
 			while ($row = mysqli_fetch_assoc($result)){
 				$rarr['messages'][] = $row;
 			}
-			die (json_encode($rarr));
+			die(json_encode($rarr));
 		} else {
 			makeError(3);
 		}
