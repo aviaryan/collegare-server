@@ -27,8 +27,9 @@
 
 	$msgObj = new Messages();
 
-	if ( $r['action'] == 'send' ){
+	if ($r['action'] == 'send'){
 		// send message
+		// id, token, content, recid
 		if ( tokenvalid($r['id'], $r['token']) ){
 			$msgObj->addInsertsFromArray($r, ['content', 'id', 'recid']);
 			$msgObj->addInsert('username', getUsername($r['id']));
@@ -41,8 +42,9 @@
 		} else {
 			makeError(3);
 		}
-	} else if ( $r['action'] == 'feed' || $r['action'] == 'feedbyuser' ){
+	} else if ($r['action'] == 'feed' || $r['action'] == 'feedbyuser'){
 		// get feed
+		// id, token [, recid]
 		if ( tokenvalid($r['id'], $r['token']) ){
 			if ($r['action'] == 'feed')
 				$msgObj->addSelection("recid={$r['id']} or id={$r['id']}");

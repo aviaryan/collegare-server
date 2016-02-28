@@ -161,6 +161,8 @@
 				$rarr['error'] = 'Non-existant user';
 			else if ($code == 7)
 				$rarr['error'] = 'Some problem occured';
+			else if ($code == 8)
+				$rarr['error'] = 'User already exists';
 			else if ($code == 11)
 				$rarr['error'] = 'Post doesn\'t exist.';
 			die( json_encode($rarr) );
