@@ -60,12 +60,13 @@
 	} else if ( $r['action'] == 'set' ){
 		// create a new post
 		// send token, userid, content, [groupid, pollid]
+		$postObj = new Posts();
+
 		if ( tokenvalid($r['id'], $r['token']) ){
-			$username = getUsername($r['id']);
-			$sqlIns = makeSQLInsert($r);
-			$cdate = date('Y-m-d H:i:s');
-			$query = "insert into posts ( {$sqlIns['cols']} , username, doc ) values ( {$sqlIns['vals']} , '$username', '$cdate' )";
-			$result = execQuery($query, 2);
+			$postObj->addInsertsFromArray($r, ['id', 'content']);
+			$postObj->addInsert('username', getUsername($r['id']));
+			$postObj->addInsert('doc', date('Y-m-d H:i:s'));
+			$result = $postObj->insert();
 			if ($result){
 				$query = "update posts set weight=postid where id={$r['id']} order by postid desc limit 1"; // add weight=posts to the last post
 				// id = r[id] is a safety belt in case of parallel requests
