@@ -74,6 +74,35 @@
 		}
 
 		/**
+		 * UPDATE OPS
+		 * FUNCTIONS FOR UPDATING TABLE
+		 */
+		
+		function update($err = 5){
+			return $this->customUpdate($this->makeSQLUpdate($this->inserts), $this->getSelectionStr(), $this->more, $err);
+		}
+
+		function getUpdateStr($changes, $selectionStr, $more){
+			$q = "update "
+				. $this->tablename
+				. " set "
+				. $changes
+				. " where "
+				. $selectionStr
+				. " $more";
+			return $q;
+		}
+
+		function customUpdate($changes, $selectionStr, $more, $err = 5){
+			$q = $this->getUpdateStr($changes, $selectionStr, $more);
+			$result = mysqli_query($this->con, $q);
+			if ($result)
+				return $result;
+			else
+				$this->makeError($err);
+		}
+
+		/**
 		 * QUERY FUNCTIONS
 		 * HELPERS
 		 */
@@ -107,6 +136,12 @@
 			return substr($str, 0, -1 * strlen($divider));
 		}
 
+		function makeSQLUpdate($r){
+			$str = '';
+			foreach ($r as $k => $v)
+				$str .= "{$k}=\"{$v}\",";
+			return substr($str, 0, -1);
+		}
 
 
 		function makeError($code){
@@ -131,5 +166,15 @@
 			die( json_encode($rarr) );
 		}
 
+
+		/**
+		 * GETTER
+		 * SETTER
+		 * STUFF
+		 */
+
+		function clearInserts(){
+			$this->inserts = [];
+		}
 	}
 ?>

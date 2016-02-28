@@ -84,9 +84,9 @@
 		$postObj->addInsert('doc', date('Y-m-d H:i:s'));
 		$result = $postObj->insert();
 		if ($result){
-			$query = "update posts set weight=postid where id={$r['id']} order by postid desc limit 1"; // add weight=posts to the last post
+			$result = $postObj->customUpdate("weight = postid", "id = {$r['id']}", "order by postid desc limit 1");
+			// add weight=posts to the last post
 			// id = r[id] is a safety belt in case of parallel requests
-			$result = mysqli_query($con, $query);
 			die(json_encode($rarr));
 		}
 	} else if ( $r['action'] == 'feed' ){
@@ -103,10 +103,7 @@
 			// get posts from group
 			$postObj->addSelection("gid={$r['gid']}");
 			$res = $postObj->getPostFeed($r['id']);
-			$rarr['posts'] = array();
-			while ($row = mysqli_fetch_assoc($res)){
-				$rarr['posts'][] = $row;
-			}
+			$rarr['posts'] = $res->fetch_all(MYSQLI_ASSOC);
 			die ( json_encode($rarr) );
 		} else {
 			// get posts for a user
@@ -131,10 +128,7 @@
 			// get posts for user
 			$postObj->addSelection("{$gq} gid=1");
 			$res = $postObj->getPostFeed($r['id']);
-			$rarr['posts'] = array();
-			while ($row = mysqli_fetch_assoc($res)){
-				$rarr['posts'][] = $row;
-			}
+			$rarr['posts'] = $res->fetch_all(MYSQLI_ASSOC);
 			die ( json_encode($rarr) );
 		}
 
