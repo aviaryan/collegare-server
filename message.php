@@ -49,10 +49,7 @@
 			else
 				$msgObj->addSelection("(id={$r['id']} and recid={$r['recid']}) or (id={$r['recid']} and recid={$r['id']})");
 			$result = $msgObj->query();
-			$rarr['messages'] = array();
-			while ($row = mysqli_fetch_assoc($result)){
-				$rarr['messages'][] = $row;
-			}
+			$rarr['messages'] = $result->fetch_all(MYSQLI_ASSOC);
 			die(json_encode($rarr));
 		} else {
 			makeError(3);
