@@ -29,6 +29,19 @@
 		}
 	}
 
+	/**
+	 * Comments Class
+	 * interacts with Comments table
+	 */
+	class Comments extends DataModel {
+		function __construct(){
+			parent::__construct();
+			$this->tablename = 'cmnts';
+			$this->addProjection('*');
+			$this->more = "order by commentid desc";
+		}
+	}
+
 
 	$r = array();
 	foreach ($_POST as $key => $value) {
@@ -47,36 +60,35 @@
 			$postarr = mysqli_fetch_assoc($result);
 			$postarr['vote'] = getUserVote($r['id'], $r['postid']);
 			// get comments
-			$query = "select * from cmnts where postid={$r['postid']} order by commentid desc";
-			$result = mysqli_query($con, $query);
+			$commentObj = new Comments();
+			$commentObj->addSelection("postid=" . $r['postid']);
+			$result = $commentObj->query();
 			$postarr['comments'] = array();
 			while ($row = mysqli_fetch_assoc($result)){
 				unset($row['postid']);
 				$postarr['comments'][] = $row;
 			}
 			$rarr = array_merge($postarr, $rarr);
-			die( json_encode($rarr) );
+			die(json_encode($rarr));
 		}
 	} else if ( $r['action'] == 'set' ){
 		// create a new post
 		// send token, userid, content, [groupid, pollid]
 		$postObj = new Posts();
-
-		if ( tokenvalid($r['id'], $r['token']) ){
-			$postObj->addInsertsFromArray($r, ['id', 'content']);
-			$postObj->addInsert('username', getUsername($r['id']));
-			$postObj->addInsert('doc', date('Y-m-d H:i:s'));
-			$result = $postObj->insert();
-			if ($result){
-				$query = "update posts set weight=postid where id={$r['id']} order by postid desc limit 1"; // add weight=posts to the last post
-				// id = r[id] is a safety belt in case of parallel requests
-				$result = mysqli_query($con, $query);
-				die( json_encode($rarr) );
-			}
-		} else {
+		// check for auth
+		if (!tokenvalid($r['id'], $r['token'])){
 			makeError(3);
 		}
-
+		$postObj->addInsertsFromArray($r, ['id', 'content']);
+		$postObj->addInsert('username', getUsername($r['id']));
+		$postObj->addInsert('doc', date('Y-m-d H:i:s'));
+		$result = $postObj->insert();
+		if ($result){
+			$query = "update posts set weight=postid where id={$r['id']} order by postid desc limit 1"; // add weight=posts to the last post
+			// id = r[id] is a safety belt in case of parallel requests
+			$result = mysqli_query($con, $query);
+			die(json_encode($rarr));
+		}
 	} else if ( $r['action'] == 'feed' ){
 		// get feed for a user or a group
 		// userid, groupid
@@ -131,20 +143,15 @@
 		// yay
 		if (!tokenvalid($r['id'], $r['token']))
 			makeError(3);
-		$username = getUsername($r['id']);
-		$sqlIns = makeSQLInsert($r);
-		$query = "insert into cmnts ( {$sqlIns['cols']},"
-			. "doc,"
-			. "username)"
-			. " values ( {$sqlIns['vals']},"
-			. "'" . date('Y-m-d H:i:s') . "',"
-			. "'" . getUsername($r['id']) . "')";
-		$result = mysqli_query($con, $query);
+		$comObj = new Comments();
+		$comObj->addInsertsFromArray($r, ['id', 'content', 'postid']);
+		$comObj->addInsert('username', getUsername($r['id']));
+		$comObj->addInsert('doc', date('Y-m-d H:i:s'));
+		$result = $comObj->insert();
 		if ($result){
 			execQuery("update posts set commentcount=commentcount+1 where postid={$r['postid']}");
 			die( json_encode($rarr) );
-		} else
-			makeError(2);
+		}
 	} else {
 		makeError(1);
 	}
