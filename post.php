@@ -11,8 +11,8 @@
 	class Posts extends DataModel {
 		var $limit;
 
-		function __construct(){
-			parent::__construct();
+		function __construct($r){
+			parent::__construct($r);
 			$this->tablename = 'posts';
 			$this->addProjection('*');
 			$this->limit = 20;
@@ -34,8 +34,8 @@
 	 * interacts with Comments table
 	 */
 	class Comments extends DataModel {
-		function __construct(){
-			parent::__construct();
+		function __construct($r){
+			parent::__construct($r);
 			$this->tablename = 'cmnts';
 			$this->addProjection('*');
 			$this->more = "order by commentid desc";
@@ -74,11 +74,9 @@
 	} else if ( $r['action'] == 'set' ){
 		// create a new post
 		// send token, userid, content, [groupid, pollid]
-		$postObj = new Posts();
-		// check for auth
-		if (!tokenvalid($r['id'], $r['token'])){
-			makeError(3);
-		}
+		$postObj = new Posts($r);
+		$postObj->checkTokenValid();
+		$postObj->checkInputHas(['content']);
 		$postObj->addInsertsFromArray($r, ['id', 'content']);
 		$postObj->addInsert('username', getUsername($r['id']));
 		$postObj->addInsert('doc', date('Y-m-d H:i:s'));
@@ -92,25 +90,23 @@
 	} else if ( $r['action'] == 'feed' ){
 		// get feed for a user or a group
 		// userid, groupid
-		$postObj = new Posts();
+		$postObj = new Posts($r);
 
-		if ( array_key_exists("gid", $r) ){
+		if ($postObj->inputHas(['gid'])){
+			$postObj->checkInputHas(['id']);
 			// limit by post id
-			if (array_key_exists("after", $r))
+			if ($postObj->inputHas(['after']))
 				$postObj->addSelection("postid > {$r['after']}");
-			else if (array_key_exists("before", $r))
+			else if ($postObj->inputHas(['before']))
 				$postObj->addSelection("postid < {$r['before']}");
 			// get posts from group
 			$postObj->addSelection("gid={$r['gid']}");
 			$res = $postObj->getPostFeed($r['id']);
 			$rarr['posts'] = $res->fetch_all(MYSQLI_ASSOC);
-			die ( json_encode($rarr) );
+			die (json_encode($rarr));
 		} else {
 			// get posts for a user
-			// check for missing id
-			if ( !array_key_exists("id", $r) ){
-				makeError(1);
-			}
+			$postObj->checkInputHas(['id']);
 			// get user groups
 			$q = "select * from eyeds where id={$r['id']}";
 			$res = mysqli_query($con, $q);
@@ -121,23 +117,23 @@
 			else
 				$gq = '';
 			// limit by post id
-			if (array_key_exists("after", $r))
+			if ($postObj->inputHas(['after']))
 				$postObj->addSelection("postid > {$r['after']}");
-			else if (array_key_exists("before", $r))
+			else if ($postObj->inputHas(['before']))
 				$postObj->addSelection("postid < {$r['before']}");
 			// get posts for user
 			$postObj->addSelection("{$gq} gid=1");
 			$res = $postObj->getPostFeed($r['id']);
 			$rarr['posts'] = $res->fetch_all(MYSQLI_ASSOC);
-			die ( json_encode($rarr) );
+			die (json_encode($rarr));
 		}
 
 	} else if ( $r['action'] == 'comment' ){
 		// make a comment on a post
-		// yay
-		if (!tokenvalid($r['id'], $r['token']))
-			makeError(3);
-		$comObj = new Comments();
+		// content, postid
+		$comObj = new Comments($r);
+		$comObj->checkTokenValid();
+		$comObj->checkInputHas(['content', 'postid']);
 		$comObj->addInsertsFromArray($r, ['id', 'content', 'postid']);
 		$comObj->addInsert('username', getUsername($r['id']));
 		$comObj->addInsert('doc', date('Y-m-d H:i:s'));

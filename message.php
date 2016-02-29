@@ -26,8 +26,7 @@
 	}
 
 	$msgObj = new Messages($r);
-	if (!$msgObj->isTokenValid())
-		makeError(3);
+	$msgObj->checkTokenValid();
 
 	if ($r['action'] == 'send'){
 		// send message

@@ -192,11 +192,23 @@
 			}
 		}
 
+		function checkTokenValid(){
+			return ($this->isTokenValid()) ? true : makeError(3);
+		}
+
 		function checkInputHas($manParams){
 			foreach ($manParams as $param){
 				if (!array_key_exists($param, $this->r))
 					makeError(5);
 			}
+		}
+
+		function inputHas($params){
+			foreach ($params as $param){
+				if (!array_key_exists($param, $this->r))
+					return false;
+			}
+			return true;
 		}
 
 		/**
