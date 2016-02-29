@@ -22,8 +22,8 @@
 		 * query table with the given projection and selections
 		 * @return resultSet result of query
 		 */
-		function query($err = ERR_ERR){
-			return $this->doQuery($this->getQueryStr(), $err);
+		function query($err = ERR_ERR, $err_ifempty = false){
+			return $this->doQuery($this->getQueryStr(), $err, $err_ifempty);
 		}
 
 		function getQueryStr(){
