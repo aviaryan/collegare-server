@@ -134,7 +134,7 @@
 		}
 
 		/**
-		 * HELPER FUNCTIONS
+		 * QUERY HELPER FUNCTIONS
 		 * NOT DIRECTLY RELATED TO QUERIES
 		 */
 
@@ -145,6 +145,11 @@
 			}
 			return substr($str, 0, -1 * strlen($divider));
 		}
+
+		/**
+		 * BASE FUNCTIONS
+		 * DO THE MOST BASE OPERATIONS OF THE APPLICATION
+		 */
 
 		function makeError($code){
 			global $rarr;
@@ -158,7 +163,7 @@
 			else if ($code == 4)
 				$rarr['error'] = "Wrong username or password";
 			else if ($code == 5)
-				$rarr['error'] = "Invalid parameters passed";
+				$rarr['error'] = "Invalid parameters passed or required parameters missing";
 			else if ($code == 6)
 				$rarr['error'] = 'Non-existant user';
 			else if ($code == 7)
@@ -181,6 +186,13 @@
 					return false;
 			} else {
 				return false;
+			}
+		}
+
+		function checkInput($r, $manParams){
+			foreach ($manParams as $param){
+				if (!array_key_exists($param, $r))
+					makeError(5);
 			}
 		}
 

@@ -26,31 +26,38 @@
 	}
 
 	$msgObj = new Messages();
+	$msgObj->checkInput($r, ['id', 'token']);
+	if (!$msgObj->isTokenValid($r['id'], $r['token']))
+		makeError(3);
 
 	if ($r['action'] == 'send'){
 		// send message
 		// id, token, content, recid
-		if (!$msgObj->isTokenValid($r['id'], $r['token']))
-			makeError(3);
+		$msgObj->checkInput($r, ['content', 'recid']);
 		$msgObj->addInsertsFromArray($r, ['content', 'id', 'recid']);
 		$msgObj->addInsert('username', getUsername($r['id']));
 		$msgObj->addInsert('username_rec', getUsername($r['recid']));
 		$msgObj->addInsert('doc', date('Y-m-d H:i:s'));
 		$result = $msgObj->insert(5);
 		die(json_encode($rarr));
-		
-	} else if ($r['action'] == 'feed' || $r['action'] == 'feedbyuser'){
+
+	} else if ($r['action'] == 'feed'){
 		// get feed
-		// id, token [, recid]
-		if (!$msgObj->isTokenValid($r['id'], $r['token']))
-			makeError(3);
-		if ($r['action'] == 'feed')
-			$msgObj->addSelection("recid={$r['id']} or id={$r['id']}");
-		else
-			$msgObj->addSelection("(id={$r['id']} and recid={$r['recid']}) or (id={$r['recid']} and recid={$r['id']})");
+		// id, token
+		$msgObj->addSelection("recid={$r['id']} or id={$r['id']}");
 		$result = $msgObj->query();
 		$rarr['messages'] = $result->fetch_all(MYSQLI_ASSOC);
 		die(json_encode($rarr));
+
+	} else if ($r['action'] == 'feedbyuser'){
+		// get chat feed with a particular user
+		// id, token, recid
+		$msgObj->checkInput($r, ['recid']);
+		$msgObj->addSelection("(id={$r['id']} and recid={$r['recid']}) or (id={$r['recid']} and recid={$r['id']})");
+		$result = $msgObj->query();
+		$rarr['messages'] = $result->fetch_all(MYSQLI_ASSOC);
+		die(json_encode($rarr));
+		
 	} else {
 		makeError(1);
 	}
