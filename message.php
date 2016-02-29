@@ -30,32 +30,27 @@
 	if ($r['action'] == 'send'){
 		// send message
 		// id, token, content, recid
-		if ( tokenvalid($r['id'], $r['token']) ){
-			$msgObj->addInsertsFromArray($r, ['content', 'id', 'recid']);
-			$msgObj->addInsert('username', getUsername($r['id']));
-			$msgObj->addInsert('username_rec', getUsername($r['recid']));
-			$msgObj->addInsert('doc', date('Y-m-d H:i:s'));
-			$result = $msgObj->insert(5);
-			if ($result){
-				die(json_encode($rarr));
-			}
-		} else {
+		if (!$msgObj->isTokenValid($r['id'], $r['token']))
 			makeError(3);
-		}
+		$msgObj->addInsertsFromArray($r, ['content', 'id', 'recid']);
+		$msgObj->addInsert('username', getUsername($r['id']));
+		$msgObj->addInsert('username_rec', getUsername($r['recid']));
+		$msgObj->addInsert('doc', date('Y-m-d H:i:s'));
+		$result = $msgObj->insert(5);
+		die(json_encode($rarr));
+		
 	} else if ($r['action'] == 'feed' || $r['action'] == 'feedbyuser'){
 		// get feed
 		// id, token [, recid]
-		if ( tokenvalid($r['id'], $r['token']) ){
-			if ($r['action'] == 'feed')
-				$msgObj->addSelection("recid={$r['id']} or id={$r['id']}");
-			else
-				$msgObj->addSelection("(id={$r['id']} and recid={$r['recid']}) or (id={$r['recid']} and recid={$r['id']})");
-			$result = $msgObj->query();
-			$rarr['messages'] = $result->fetch_all(MYSQLI_ASSOC);
-			die(json_encode($rarr));
-		} else {
+		if (!$msgObj->isTokenValid($r['id'], $r['token']))
 			makeError(3);
-		}
+		if ($r['action'] == 'feed')
+			$msgObj->addSelection("recid={$r['id']} or id={$r['id']}");
+		else
+			$msgObj->addSelection("(id={$r['id']} and recid={$r['recid']}) or (id={$r['recid']} and recid={$r['id']})");
+		$result = $msgObj->query();
+		$rarr['messages'] = $result->fetch_all(MYSQLI_ASSOC);
+		die(json_encode($rarr));
 	} else {
 		makeError(1);
 	}

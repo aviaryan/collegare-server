@@ -18,9 +18,8 @@
 		 * query table with the given projection and selections
 		 * @return resultSet result of query
 		 */
-		function query(){
-			$result = mysqli_query($this->con, $this->getQueryStr());
-			return $result;
+		function query($err = 1){
+			return $this->doQuery($this->getQueryStr(), $err);
 		}
 
 		function getQueryStr(){
@@ -34,10 +33,10 @@
 			return $q;
 		}
 
-		function doQuery($q){
+		function doQuery($q, $err=1){
 			//echo $q;
 			$result = mysqli_query($this->con, $q);
-			return $result;
+			return ($result) ? $result : $this->makeError($err);
 		}
 
 		/**
@@ -127,6 +126,17 @@
 			return $this->arrayToStr($this->projections, '', '', ',');
 		}
 
+		function makeSQLUpdate($r){
+			$str = '';
+			foreach ($r as $k => $v)
+				$str .= "{$k}=\"{$v}\",";
+			return substr($str, 0, -1);
+		}
+
+		/**
+		 * HELPER FUNCTIONS
+		 * NOT DIRECTLY RELATED TO QUERIES
+		 */
 
 		function arrayToStr($arr, $left='', $right='', $divider=','){
 			$str = '';
@@ -135,14 +145,6 @@
 			}
 			return substr($str, 0, -1 * strlen($divider));
 		}
-
-		function makeSQLUpdate($r){
-			$str = '';
-			foreach ($r as $k => $v)
-				$str .= "{$k}=\"{$v}\",";
-			return substr($str, 0, -1);
-		}
-
 
 		function makeError($code){
 			global $rarr;
@@ -165,9 +167,22 @@
 				$rarr['error'] = 'User already exists';
 			else if ($code == 11)
 				$rarr['error'] = 'Post doesn\'t exist.';
-			die( json_encode($rarr) );
+			die(json_encode($rarr));
 		}
 
+		function isTokenValid($id, $token){
+			$query = "select token from auths where id={$id}";
+			$result = $this->doQuery($query, 2);
+			if (mysqli_num_rows($result) > 0){
+				$intoken = mysqli_fetch_row($result)[0];
+				if ($intoken == $token)
+					return true;
+				else
+					return false;
+			} else {
+				return false;
+			}
+		}
 
 		/**
 		 * GETTER
