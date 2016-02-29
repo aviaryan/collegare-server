@@ -28,11 +28,11 @@
 				. ") order by weight desc" );
 		}
 
-		function getUserGroups(){
+		function getUserGroups(){ // TODO : Change group implementation
 			$q = "select groups from eyeds where id={$this->r['id']}";
 			$res = $this->doQuery($q);
-			$groups = mysqli_fetch_assoc($res);
-			$groups = ArrToLike(StrToArr($row['groups']),0);
+			$groups = $res->fetch_row()[0];
+			return $groups;
 		}
 	}
 
@@ -60,8 +60,9 @@
 	if ( $r['action'] == 'get' ){
 		// get a single post
 		// with all the fucking comments
+		$obj = new DataModel($r);
 		$query = "select * from posts where postid={$r['postid']}";
-		$result = execQuery($query, ERR_NOPOST); // TODO : FIX THIS
+		$result = $obj->doQuery($query, ERR_NOPOST, true);
 
 		if ($result){
 			$postarr = mysqli_fetch_assoc($result);
@@ -115,10 +116,7 @@
 			// get posts for a user
 			$postObj->checkInputHas(['id']);
 			// get user groups
-			$q = "select * from eyeds where id={$r['id']}";
-			$res = mysqli_query($con, $q);
-			$row = mysqli_fetch_assoc($res);
-			$groups = ArrToLike(StrToArr($row['groups']),0);
+			$groups = $postObj->getUserGroups();
 			if ($groups != '')
 				$gq = "gid in ({$groups}) or";
 			else
@@ -150,7 +148,7 @@
 			die( json_encode($rarr) );
 		}
 	} else {
-		makeError(1);
+		makeError(ERR_NOACTION);
 	}
 
 

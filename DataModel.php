@@ -22,7 +22,7 @@
 		 * query table with the given projection and selections
 		 * @return resultSet result of query
 		 */
-		function query($err = 1){
+		function query($err = ERR_ERR){
 			return $this->doQuery($this->getQueryStr(), $err);
 		}
 
@@ -37,10 +37,19 @@
 			return $q;
 		}
 
-		function doQuery($q, $err=1){
+		function doQuery($q, $err = ERR_ERR, $err_ifempty = false){
 			//echo $q;
 			$result = mysqli_query($this->con, $q);
-			return ($result) ? $result : $this->makeError($err);
+			if ($result){
+				if ($err_ifempty){
+					if ($result->num_rows == 0)
+						$this->makeError($err);
+					else
+						return $result;
+				} else 
+					return $result;
+			} else
+				return $this->makeError($err);
 		}
 
 		/**
@@ -48,12 +57,8 @@
 		 * FUNCTIONS FOR INSERTING TO TABLE
 		 */
 
-		function insert($err = 2){
-			$result = mysqli_query($this->con, $this->getInsertStr());
-			if ($result)
-				return $result;
-			else
-				$this->makeError($err);
+		function insert($err = ERR_DBCONN){
+			return $this->doQuery($this->getInsertStr(), $err);
 		}
 
 		function getInsertStr(){
@@ -81,7 +86,7 @@
 		 * FUNCTIONS FOR UPDATING TABLE
 		 */
 		
-		function update($err = 5){
+		function update($err = ERR_ERR){
 			return $this->customUpdate($this->makeSQLUpdate($this->inserts), $this->getSelectionStr(), $this->more, $err);
 		}
 
@@ -96,13 +101,9 @@
 			return $q;
 		}
 
-		function customUpdate($changes, $selectionStr, $more, $err = 5){
+		function customUpdate($changes, $selectionStr, $more, $err = ERR_ERR){
 			$q = $this->getUpdateStr($changes, $selectionStr, $more);
-			$result = mysqli_query($this->con, $q);
-			if ($result)
-				return $result;
-			else
-				$this->makeError($err);
+			return $this->doQuery($q, $err);
 		}
 
 		/**
@@ -195,13 +196,13 @@
 		}
 
 		function checkTokenValid(){
-			return ($this->isTokenValid()) ? true : makeError(3);
+			return ($this->isTokenValid()) ? true : $this->makeError(ERR_AUTH);
 		}
 
 		function checkInputHas($manParams){
 			foreach ($manParams as $param){
 				if (!array_key_exists($param, $this->r))
-					makeError(5);
+					$this->makeError(ERR_ARGS);
 			}
 		}
 
