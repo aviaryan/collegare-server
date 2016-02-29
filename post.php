@@ -34,6 +34,14 @@
 			$groups = $res->fetch_row()[0];
 			return $groups;
 		}
+
+		function getUserVote($id, $postid){
+			$res = $this->doQuery("select vote from vts where id={$id} and postid={$postid}");
+			if (mysqli_num_rows($res) > 0)
+				return mysqli_fetch_row($res)[0];
+			else
+				return 0;
+		}
 	}
 
 	/**
@@ -49,7 +57,6 @@
 		}
 	}
 
-
 	$r = array();
 	foreach ($_POST as $key => $value) {
 		$r[$key] = mysqli_real_escape_string( $con, $value );
@@ -60,25 +67,24 @@
 	if ( $r['action'] == 'get' ){
 		// get a single post
 		// with all the fucking comments
-		$obj = new DataModel($r);
-		$query = "select * from posts where postid={$r['postid']}";
-		$result = $obj->doQuery($query, ERR_NOPOST, true);
-
-		if ($result){
-			$postarr = mysqli_fetch_assoc($result);
-			$postarr['vote'] = getUserVote($r['id'], $r['postid']);
-			// get comments
-			$commentObj = new Comments($r);
-			$commentObj->addSelection("postid=" . $r['postid']);
-			$result = $commentObj->query();
-			$postarr['comments'] = array();
-			while ($row = mysqli_fetch_assoc($result)){
-				unset($row['postid']);
-				$postarr['comments'][] = $row;
-			}
-			$rarr = array_merge($postarr, $rarr);
-			die(json_encode($rarr));
+		$obj = new Posts($r);
+		$obj->checkInputHas(['postid']);
+		$obj->addSelection("postid = {$r['postid']}");
+		$result = $obj->query(ERR_NOPOST, true);
+		$postarr = mysqli_fetch_assoc($result);
+		$postarr['vote'] = $obj->getUserVote($r['id'], $r['postid']);
+		// get comments
+		$commentObj = new Comments($r);
+		$commentObj->addSelection("postid=" . $r['postid']);
+		$result = $commentObj->query();
+		$postarr['comments'] = array();
+		while ($row = mysqli_fetch_assoc($result)){
+			unset($row['postid']);
+			$postarr['comments'][] = $row;
 		}
+		$rarr = array_merge($postarr, $rarr);
+		die(json_encode($rarr));
+
 	} else if ( $r['action'] == 'set' ){
 		// create a new post
 		// send token, userid, content, [groupid, pollid]
@@ -149,14 +155,5 @@
 		}
 	} else {
 		makeError(ERR_NOACTION);
-	}
-
-
-	function getUserVote($id, $postid){
-		$res = execQuery("select vote from vts where id={$id} and postid={$postid}");
-		if (mysqli_num_rows($res) > 0)
-			return mysqli_fetch_row($res)[0];
-		else
-			return 0;
 	}
 ?>
