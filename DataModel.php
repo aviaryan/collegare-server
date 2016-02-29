@@ -7,11 +7,13 @@
 		var $selections = [];
 		var $inserts = [];
 		var $more = '';
+		var $r;
 		var $con;
 
-		function __construct(){
+		function __construct($r = []){
 			global $con;
 			$this->con = $con;
+			$this->r = $r;
 		}
 
 		/**
@@ -189,9 +191,9 @@
 			}
 		}
 
-		function checkInput($r, $manParams){
+		function checkInputHas($manParams){
 			foreach ($manParams as $param){
-				if (!array_key_exists($param, $r))
+				if (!array_key_exists($param, $this->r))
 					makeError(5);
 			}
 		}
