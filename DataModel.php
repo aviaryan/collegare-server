@@ -1,5 +1,7 @@
 <?php
 	
+	include("base.php");
+
 	class DataModel {
 
 		var $projections = [];
@@ -156,23 +158,23 @@
 		function makeError($code){
 			global $rarr;
 			$rarr['status'] = $code;
-			if ($code == 1)
-				$rarr['error'] = "Invalid Option";
-			else if ($code == 2)
+			if ($code == ERR_NOACTION)
+				$rarr['error'] = "Invalid Action";
+			else if ($code == ERR_DBCONN)
 				$rarr['error'] = "Database connection error";
-			else if ($code == 3)
+			else if ($code == ERR_AUTH)
 				$rarr['error'] = "Problem while authenticating the user";
-			else if ($code == 4)
+			else if ($code == ERR_LOGINFAIL)
 				$rarr['error'] = "Wrong username or password";
-			else if ($code == 5)
+			else if ($code == ERR_ARGS)
 				$rarr['error'] = "Invalid parameters passed or required parameters missing";
-			else if ($code == 6)
+			else if ($code == ERR_NOUSER)
 				$rarr['error'] = 'Non-existant user';
-			else if ($code == 7)
+			else if ($code == ERR_ERR)
 				$rarr['error'] = 'Some problem occured';
-			else if ($code == 8)
+			else if ($code == ERR_USER_EXISTS)
 				$rarr['error'] = 'User already exists';
-			else if ($code == 11)
+			else if ($code == ERR_NOPOST)
 				$rarr['error'] = 'Post doesn\'t exist.';
 			die(json_encode($rarr));
 		}

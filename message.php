@@ -57,6 +57,6 @@
 		die(json_encode($rarr));
 
 	} else {
-		makeError(1);
+		$msgObj->makeError(ERR_NOACTION);
 	}
 ?>

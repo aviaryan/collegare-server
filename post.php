@@ -27,6 +27,13 @@
 					. "on v.postid = p.postid"
 				. ") order by weight desc" );
 		}
+
+		function getUserGroups(){
+			$q = "select groups from eyeds where id={$this->r['id']}";
+			$res = $this->doQuery($q);
+			$groups = mysqli_fetch_assoc($res);
+			$groups = ArrToLike(StrToArr($row['groups']),0);
+		}
 	}
 
 	/**
@@ -54,13 +61,13 @@
 		// get a single post
 		// with all the fucking comments
 		$query = "select * from posts where postid={$r['postid']}";
-		$result = execQuery($query, 11);
+		$result = execQuery($query, ERR_NOPOST); // TODO : FIX THIS
 
 		if ($result){
 			$postarr = mysqli_fetch_assoc($result);
 			$postarr['vote'] = getUserVote($r['id'], $r['postid']);
 			// get comments
-			$commentObj = new Comments();
+			$commentObj = new Comments($r);
 			$commentObj->addSelection("postid=" . $r['postid']);
 			$result = $commentObj->query();
 			$postarr['comments'] = array();
