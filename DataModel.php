@@ -177,12 +177,13 @@
 			die(json_encode($rarr));
 		}
 
-		function isTokenValid($id, $token){
-			$query = "select token from auths where id={$id}";
+		function isTokenValid(){
+			$this->checkInputHas(['id', 'token']); // check if keys exist
+			$query = "select token from auths where id={$this->r['id']}";
 			$result = $this->doQuery($query, 2);
 			if (mysqli_num_rows($result) > 0){
 				$intoken = mysqli_fetch_row($result)[0];
-				if ($intoken == $token)
+				if ($intoken == $this->r['token'])
 					return true;
 				else
 					return false;

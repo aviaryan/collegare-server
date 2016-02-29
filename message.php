@@ -26,8 +26,7 @@
 	}
 
 	$msgObj = new Messages($r);
-	$msgObj->checkInputHas(['id', 'token']);
-	if (!$msgObj->isTokenValid($r['id'], $r['token']))
+	if (!$msgObj->isTokenValid())
 		makeError(3);
 
 	if ($r['action'] == 'send'){
