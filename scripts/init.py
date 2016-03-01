@@ -2,6 +2,7 @@ import requests
 import hashlib
 import json
 import random
+from sys import exit
 
 # the script creates tables, then users, posts, comments etc
 

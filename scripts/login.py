@@ -3,9 +3,9 @@ import hashlib
 import json
 
 server = "http://collegare.eu5.org"
-server = "http://localhost/collegare-server"
+# server = "http://localhost/collegare-server"
 
-username="test3"
+username="test1"
 password="qwerty"
 
 phash = hashlib.sha256( str.encode(password) ).hexdigest()
@@ -50,7 +50,7 @@ if r.ok:
 	print( json.dumps(json_res, indent=4, sort_keys=True) )
 
 # get user pic
-payload = {'action': 'getfullpic', 'username': username}
+payload = {'action': 'getpic', 'username': username}
 r = requests.post(server + "/user.php", data = payload )
 if r.ok:
 	json_res = json.loads( bytes.decode(r.content) )

@@ -16,9 +16,9 @@ server = "http://collegare.eu5.org"
 server = "http://localhost/collegare-server"
 
 payload = {
-	    'firstname': 'test',
+	    'firstname': 'test1',
 	    'lastname': 'ac100',
-	    'username': 'test100',
+	    'username': 'test1',
 	    'phash': 'qwerty'
 	}
 
