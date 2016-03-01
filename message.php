@@ -36,7 +36,7 @@
 		$msgObj->addInsert('username', getUsername($r['id']));
 		$msgObj->addInsert('username_rec', getUsername($r['recid']));
 		$msgObj->addInsert('doc', date('Y-m-d H:i:s'));
-		$result = $msgObj->insert(5);
+		$result = $msgObj->insert(ERR_NOUSER);
 		die(json_encode($rarr));
 
 	} else if ($r['action'] == 'feed'){
