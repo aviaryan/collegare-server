@@ -33,7 +33,7 @@
 					. "join "
 					. "(select username, id from eyeds) as u2 "
 					. "on u2.id = m.recid"
-				. ")" );
+				. ") order by msgid desc" );
 		}
 	}
 
@@ -45,8 +45,6 @@
 		// id, token, content, recid
 		$msgObj->checkInputHas(['content', 'recid']);
 		$msgObj->addInsertsFromArray($r, ['content', 'id', 'recid']);
-		// $msgObj->addInsert('username', getUsername($r['id']));
-		// $msgObj->addInsert('username_rec', getUsername($r['recid']));
 		$msgObj->addInsert('doc', date('Y-m-d H:i:s'));
 		$result = $msgObj->insert(ERR_NOUSER);
 		die(json_encode($rarr));
