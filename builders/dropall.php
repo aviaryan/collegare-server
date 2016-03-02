@@ -7,5 +7,8 @@
 	foreach ($arr as $value) {
 		$query = "drop table if exists {$value}";
 		$result = mysqli_query($con, $query);
+		if ($result){
+			echo "dropping table $value success";
+		}
 	}
 ?>
