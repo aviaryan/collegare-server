@@ -14,14 +14,10 @@
 		. "doc timestamp,"
 		. "id INT(5),"
 		. "recid INT(5),"
-		. "username varchar(30),"
-		. "username_rec varchar(30),"
 
 		. "foreign key (id) references eyeds (id) on delete cascade,"
 		. "foreign key (recid) references eyeds (id) on delete cascade,"
-		. "foreign key (username) references eyeds (username) on delete cascade on update cascade,"
-		. "foreign key (username_rec) references eyeds (username) on delete cascade on update cascade,"
-
+	
 		. "index (id) ,"
 		. "index (recid)"
 		. ") ENGINE=InnoDB";

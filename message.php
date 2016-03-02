@@ -23,6 +23,18 @@
 			$this->addProjection('*');
 			$this->more = "order by msgid desc limit 20";
 		}
+
+		function getMessageFeed(){
+			return $this->doQuery( "select m.*, u1.username as username, u2.username as username_rec from ("
+					. "(" . $this->getQueryStr() . ") as m "
+					. "join "
+					. "(select username, id from eyeds) as u1 "
+					. "on u1.id = m.id "
+					. "join "
+					. "(select username, id from eyeds) as u2 "
+					. "on u2.id = m.recid"
+				. ")" );
+		}
 	}
 
 	$msgObj = new Messages($r);
@@ -33,8 +45,8 @@
 		// id, token, content, recid
 		$msgObj->checkInputHas(['content', 'recid']);
 		$msgObj->addInsertsFromArray($r, ['content', 'id', 'recid']);
-		$msgObj->addInsert('username', getUsername($r['id']));
-		$msgObj->addInsert('username_rec', getUsername($r['recid']));
+		// $msgObj->addInsert('username', getUsername($r['id']));
+		// $msgObj->addInsert('username_rec', getUsername($r['recid']));
 		$msgObj->addInsert('doc', date('Y-m-d H:i:s'));
 		$result = $msgObj->insert(ERR_NOUSER);
 		die(json_encode($rarr));
@@ -43,7 +55,7 @@
 		// get feed
 		// id, token
 		$msgObj->addSelection("recid={$r['id']} or id={$r['id']}");
-		$result = $msgObj->query();
+		$result = $msgObj->getMessageFeed();
 		$rarr['messages'] = array();
 		while ($row = $result->fetch_assoc())
 			$rarr['messages'][] = $row;
@@ -54,7 +66,7 @@
 		// id, token, recid
 		$msgObj->checkInputHas(['recid']);
 		$msgObj->addSelection("(id={$r['id']} and recid={$r['recid']}) or (id={$r['recid']} and recid={$r['id']})");
-		$result = $msgObj->query();
+		$result = $msgObj->getMessageFeed();
 		$rarr['messages'] = array();
 		while ($row = $result->fetch_assoc())
 			$rarr['messages'][] = $row;
