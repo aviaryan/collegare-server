@@ -21,7 +21,7 @@
 		. "phash varchar(65),"
 		
 		. "index (username)"
-		. ")";
+		. ") ENGINE=InnoDB";
 	
 	$result = mysqli_query($con, $query);
 	if ($result){

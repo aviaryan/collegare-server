@@ -14,7 +14,7 @@
 		. "bio Varchar(500) ,"
 		. "gid INT(4) auto_increment primary key"
 		
-		. ")";
+		. ") ENGINE=InnoDB";
 	
 	$result = mysqli_query($con, $query);
 

@@ -24,7 +24,7 @@
 
 		. "index (id) ,"
 		. "index (recid)"
-		. ")";
+		. ") ENGINE=InnoDB";
 	
 	$result = mysqli_query($con, $query);
 	if ($result){

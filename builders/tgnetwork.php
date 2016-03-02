@@ -19,7 +19,7 @@
 
 		. "index(id),"
 		. "index(gid)"
-		. ")";
+		. ") ENGINE=InnoDB";
 	
 	$result = mysqli_query($con, $query);
 	if ($result){

@@ -17,7 +17,7 @@
 		. "foreign key (postid) references posts (postid) on delete cascade,"
 
 		. "index(id)"
-		. ")";
+		. ") ENGINE=InnoDB";
 	
 	$result = mysqli_query($con, $query);
 	if ($result){

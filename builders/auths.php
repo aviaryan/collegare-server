@@ -14,7 +14,7 @@
 
 		. "foreign key (id) references eyeds (id) on delete cascade,"
 		. "index (id)"
-		. ")";
+		. ") ENGINE=InnoDB";
 	
 	$result = mysqli_query($con, $query);
 	if ($result){

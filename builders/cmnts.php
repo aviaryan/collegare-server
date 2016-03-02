@@ -22,7 +22,7 @@
 
 		. "index (postid)"
 		// no need for id for now
-		. ")";
+		. ") ENGINE=InnoDB";
 	
 	$result = mysqli_query($con, $query);
 	if ($result){
