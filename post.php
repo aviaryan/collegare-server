@@ -116,7 +116,9 @@
 			// get posts from group
 			$postObj->addSelection("gid={$r['gid']}");
 			$res = $postObj->getPostFeed($r['id']);
-			$rarr['posts'] = $res->fetch_all(MYSQLI_ASSOC);
+			$rarr['posts'] = array();
+			while ($row = $res->fetch_assoc())
+				$rarr['posts'][] = $row;
 			die (json_encode($rarr));
 		} else {
 			// get posts for a user
@@ -135,7 +137,9 @@
 			// get posts for user
 			$postObj->addSelection("{$gq} gid=1");
 			$res = $postObj->getPostFeed($r['id']);
-			$rarr['posts'] = $res->fetch_all(MYSQLI_ASSOC);
+			$rarr['posts'] = array();
+			while ($row = $res->fetch_assoc())
+				$rarr['posts'][] = $row;
 			die (json_encode($rarr));
 		}
 

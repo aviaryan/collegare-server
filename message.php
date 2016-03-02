@@ -44,7 +44,9 @@
 		// id, token
 		$msgObj->addSelection("recid={$r['id']} or id={$r['id']}");
 		$result = $msgObj->query();
-		$rarr['messages'] = $result->fetch_all(MYSQLI_ASSOC);
+		$rarr['messages'] = array();
+		while ($row = $result->fetch_assoc())
+			$rarr['messages'][] = $row;
 		die(json_encode($rarr));
 
 	} else if ($r['action'] == 'feedbyuser'){
@@ -53,7 +55,9 @@
 		$msgObj->checkInputHas(['recid']);
 		$msgObj->addSelection("(id={$r['id']} and recid={$r['recid']}) or (id={$r['recid']} and recid={$r['id']})");
 		$result = $msgObj->query();
-		$rarr['messages'] = $result->fetch_all(MYSQLI_ASSOC);
+		$rarr['messages'] = array();
+		while ($row = $result->fetch_assoc())
+			$rarr['messages'][] = $row;
 		die(json_encode($rarr));
 
 	} else {
