@@ -1,6 +1,7 @@
 # Collegare Server
 
-Unofficial IIIT Vadodara social app
+Unofficial IIIT Vadodara social app. A work in progress. [Android app](https://github.com/bxute/collegare-app) 
+
 
 ### Setting up
 
@@ -10,4 +11,4 @@ Unofficial IIIT Vadodara social app
 
 ### Docs
 
-See [Wiki](https://github.com/aviaryan/collegare-server/wiki) for documentation.
+See [Wiki](https://github.com/aviaryan/collegare-server/wiki) for API documentation.
